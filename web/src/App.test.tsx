@@ -8,4 +8,9 @@ describe('App', () => {
       screen.getByRole('heading', { name: 'MLB Hitter Analytics Portal' }),
     ).toBeInTheDocument()
   })
+
+  it('renders an element styled with a design token', () => {
+    render(<App />)
+    expect(screen.getByTestId('token-sample')).toHaveClass('bg-card')
+  })
 })

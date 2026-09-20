@@ -1,0 +1,25 @@
+@import 'tailwindcss';
+
+/* Design tokens from frontend-plan.md §4.3. Single dark theme, no light variant. */
+@theme {
+  --color-background: #0b131e;
+  --color-card: #1e293b;
+  --color-header: #15202b;
+  --color-foreground: #f8fafc;
+  --color-subtext: #94a3b8;
+  --color-above: #ef4444;
+  --color-above-strong: #e11d48;
+  --color-below: #3b82f6;
+  --color-below-strong: #2563eb;
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
+}
