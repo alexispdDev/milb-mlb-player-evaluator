@@ -283,7 +283,7 @@ App
 ## 7. Implementation Plan & Milestones
 
 ### Milestone 1: Setup & Design Foundations
-* Initialize project using modern tooling (e.g., Vite, React/TypeScript, CSS Modules/Tailwind).
+* Initialize the project with the stack defined in §8.
 * Configure CSS variables for colors, surface elevations, and typography.
 * Store the mock data fixture at `src/data/players.json`.
 * Construct the main `DashboardLayout` shell.
@@ -308,3 +308,21 @@ App
 * Implement missing-metric fallbacks (`"N/A"` states).
 * Add ARIA labels across all gauges and audit keyboard focus traps.
 * Validate performance budgets and contrast ratios.
+
+---
+
+## 8. Tech Stack (Decided)
+
+| Area | Choice | Notes |
+|---|---|---|
+| Build tool | Vite | Static build, no backend in v1. |
+| UI framework | React + TypeScript | |
+| Styling | Tailwind CSS | Palette from §4.3 defined as theme tokens / CSS variables; single dark theme. |
+| Gauges | Hand-written SVG | Semicircular arc + needle, CSS transitions for the sweep. |
+| Trend chart | Recharts (visx if more control is needed) | One line chart with tooltip. |
+| Player selector | Headless UI Combobox | Typeahead and keyboard support required by §4.4. |
+| State | `useState` / `useReducer` | Only `selectedPlayerId` and `selectedSeason`. |
+| Data contract | Zod schema (or plain TS types) for §5 | Validates the fixture now and a real feed later. |
+| Testing | Vitest + React Testing Library, axe for a11y checks | Covers ARIA labels and contrast requirements. |
+
+**Rationale:** Most widely supported stack, matches the v1 scope (single view, local JSON, no backend), and leaves a clear path to an API for the Phase 2 SaaS.
