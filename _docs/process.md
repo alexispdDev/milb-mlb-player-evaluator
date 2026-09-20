@@ -30,5 +30,5 @@ Rules
 - QA does not fix the code, only outputs PASS or FAIL
 - The orchestrator closes the issue only after QA outputs PASS
 - Work directly on `main`: no feature branches or PRs
-- Commit each task with `closes #N` in the message, and push
+- Commit each task with `refs #N` in the message (not `closes`), and push. The issue is closed by the orchestrator after QA passes
 - Run tests, build and lint before pushing
