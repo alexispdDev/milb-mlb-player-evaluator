@@ -79,6 +79,7 @@ function TrendLineChart({
       data={trend.points}
       width={w}
       height={h}
+      accessibilityLayer={false}
       margin={{ top: 8, right: 16, bottom: 24, left: 0 }}
     >
       <CartesianGrid stroke="var(--color-header)" strokeDasharray="3 3" />

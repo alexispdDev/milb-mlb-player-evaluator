@@ -1,4 +1,5 @@
 import type { LoadError } from '../data/loadPlayers'
+import { FOCUS_RING } from './focusRing'
 
 interface LoadErrorBannerProps {
   kind?: LoadError['kind']
@@ -30,7 +31,7 @@ function LoadErrorBanner({
         type="button"
         data-testid="load-error-reload"
         onClick={() => onReload()}
-        className="rounded border border-above px-3 py-1 text-above-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-below"
+        className={`rounded border border-above px-3 py-1 text-above-strong ${FOCUS_RING}`}
       >
         Reload Application
       </button>

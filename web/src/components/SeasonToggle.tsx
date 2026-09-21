@@ -1,4 +1,5 @@
 import { useId } from 'react'
+import { PEER_FOCUS_RING } from './focusRing'
 
 interface SeasonToggleProps {
   seasons: number[]
@@ -32,7 +33,7 @@ function SeasonToggle({ seasons, selected, onSelect }: SeasonToggleProps) {
             />
             <label
               htmlFor={id}
-              className={`block cursor-pointer rounded border-b-2 px-3 py-1 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-below ${
+              className={`block cursor-pointer rounded border-b-2 px-3 py-1 ${PEER_FOCUS_RING} ${
                 isSelected
                   ? 'border-below bg-card font-semibold text-foreground'
                   : 'border-transparent text-subtext'

@@ -5,6 +5,7 @@ import {
   ComboboxOption,
   ComboboxOptions,
 } from '@headlessui/react'
+import { FOCUS_RING } from './focusRing'
 import { filterPlayers, type PlayerSummary } from '../data/loadPlayers'
 
 interface PlayerSelectorProps {
@@ -32,7 +33,7 @@ function PlayerSelector({ players, selectedId, onSelect }: PlayerSelectorProps) 
         <ComboboxInput
           aria-label="Player"
           data-testid="player-selector-input"
-          className="w-full max-w-full truncate rounded bg-card px-2 py-1 text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-below"
+          className={`w-full max-w-full truncate rounded bg-card px-2 py-1 text-foreground ${FOCUS_RING}`}
           displayValue={nameOf}
           onChange={(e) => setQuery(e.target.value)}
         />
