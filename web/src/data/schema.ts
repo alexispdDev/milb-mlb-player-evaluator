@@ -41,10 +41,9 @@ const trendSchema = z.object({
   points: z
     .array(trendPointSchema)
     .min(1)
-    .refine(
-      (points) => points.every((p, i) => i === 0 || p.pa > points[i - 1].pa),
-      { message: 'trend pa values must be strictly increasing' },
-    ),
+    .refine((points) => points.every((p, i) => i === 0 || p.pa > points[i - 1].pa), {
+      message: 'trend pa values must be strictly increasing',
+    }),
 })
 
 export const playerProfileSchema = z.object({
@@ -52,10 +51,11 @@ export const playerProfileSchema = z.object({
   season: z.number().int(),
   identity: identitySchema,
   summary: summarySchema,
-  metrics: z.array(metricSchema).refine(
-    (metrics) => new Set(metrics.map((m) => m.id)).size === metrics.length,
-    { message: 'metric ids must be unique within a profile' },
-  ),
+  metrics: z
+    .array(metricSchema)
+    .refine((metrics) => new Set(metrics.map((m) => m.id)).size === metrics.length, {
+      message: 'metric ids must be unique within a profile',
+    }),
   trend: trendSchema,
 })
 

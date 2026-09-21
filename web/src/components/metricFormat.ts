@@ -5,11 +5,7 @@ export function formatMetricValue(value: number, unit: string): string {
   return unit === '%' || unit === '°' ? `${num}${unit}` : `${num} ${unit}`
 }
 
-export function isAboveAverage(
-  metric: Pick<Metric, 'value' | 'leagueAvg' | 'inverted'>,
-): boolean {
+export function isAboveAverage(metric: Pick<Metric, 'value' | 'leagueAvg' | 'inverted'>): boolean {
   if (metric.value === null) return false
-  return metric.inverted
-    ? metric.value < metric.leagueAvg
-    : metric.value > metric.leagueAvg
+  return metric.inverted ? metric.value < metric.leagueAvg : metric.value > metric.leagueAvg
 }

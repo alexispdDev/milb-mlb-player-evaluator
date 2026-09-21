@@ -31,9 +31,7 @@ describe('focusRing', () => {
   })
 
   it('SeasonToggle label has every PEER_FOCUS_RING class', () => {
-    render(
-      createElement(SeasonToggle, { seasons: [2024], selected: 2024, onSelect: () => {} }),
-    )
+    render(createElement(SeasonToggle, { seasons: [2024], selected: 2024, onSelect: () => {} }))
     const label = screen.getByText('2024')
     expect(label.tagName).toBe('LABEL')
     expect(hasAll(label, PEER_FOCUS_RING)).toBe(true)

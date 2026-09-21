@@ -32,8 +32,6 @@ export function buildGaugeAriaLabel(metric: Metric): string {
   const name = SPOKEN_NAMES[metric.id] ?? toTitleCase(metric.name)
   const avg = withUnit(metric.leagueAvg.toFixed(1), metric.unit)
   const isNa = metric.value === null || metric.percentile === null
-  const value = isNa
-    ? 'not available'
-    : withUnit((metric.value as number).toFixed(1), metric.unit)
+  const value = isNa ? 'not available' : withUnit((metric.value as number).toFixed(1), metric.unit)
   return `${name}: ${value}, League Average: ${avg}`
 }

@@ -21,12 +21,8 @@ describe('TopNavigation', () => {
         seasonToggle={<span data-testid="s">S</span>}
       />,
     )
-    expect(screen.getByTestId('player-selector-slot')).toContainElement(
-      screen.getByTestId('p'),
-    )
-    expect(screen.getByTestId('season-toggle-slot')).toContainElement(
-      screen.getByTestId('s'),
-    )
+    expect(screen.getByTestId('player-selector-slot')).toContainElement(screen.getByTestId('p'))
+    expect(screen.getByTestId('season-toggle-slot')).toContainElement(screen.getByTestId('s'))
   })
 
   it('applies the header background token to the header element', () => {

@@ -2,11 +2,7 @@ import { act, renderHook } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import players from './data/players.json'
 import { playerProfilesSchema, type PlayerProfile } from './data/schema'
-import {
-  dashboardReducer,
-  initialDashboardState,
-  useDashboardState,
-} from './useDashboardState'
+import { dashboardReducer, initialDashboardState, useDashboardState } from './useDashboardState'
 
 const base = playerProfilesSchema.parse(players)
 
@@ -16,7 +12,7 @@ function make(id: string, season: number): PlayerProfile {
 }
 
 describe('initialDashboardState', () => {
-  it('uses the first player and that player\'s own latest season', () => {
+  it("uses the first player and that player's own latest season", () => {
     const data = [make('a', 2024), make('b', 2025)]
     expect(initialDashboardState(data)).toEqual({
       selectedPlayerId: 'a',
@@ -31,33 +27,34 @@ describe('dashboardReducer', () => {
 
   it('keeps the season when the new player has it', () => {
     const data2 = [...data, make('b', 2025)]
-    expect(
-      dashboardReducer(state, { type: 'selectPlayer', id: 'b', players: data2 }),
-    ).toEqual({ selectedPlayerId: 'b', selectedSeason: 2025 })
+    expect(dashboardReducer(state, { type: 'selectPlayer', id: 'b', players: data2 })).toEqual({
+      selectedPlayerId: 'b',
+      selectedSeason: 2025,
+    })
   })
 
   it('falls back to the latest season of a player lacking the season', () => {
-    expect(
-      dashboardReducer(state, { type: 'selectPlayer', id: 'b', players: data }),
-    ).toEqual({ selectedPlayerId: 'b', selectedSeason: 2024 })
+    expect(dashboardReducer(state, { type: 'selectPlayer', id: 'b', players: data })).toEqual({
+      selectedPlayerId: 'b',
+      selectedSeason: 2024,
+    })
   })
 
   it('ignores an unknown player id', () => {
-    expect(
-      dashboardReducer(state, { type: 'selectPlayer', id: 'zzz', players: data }),
-    ).toBe(state)
+    expect(dashboardReducer(state, { type: 'selectPlayer', id: 'zzz', players: data })).toBe(state)
   })
 
   it('ignores a season the player lacks', () => {
-    expect(
-      dashboardReducer(state, { type: 'selectSeason', season: 2019, players: data }),
-    ).toBe(state)
+    expect(dashboardReducer(state, { type: 'selectSeason', season: 2019, players: data })).toBe(
+      state,
+    )
   })
 
   it('changes to a season the player has', () => {
-    expect(
-      dashboardReducer(state, { type: 'selectSeason', season: 2024, players: data }),
-    ).toEqual({ selectedPlayerId: 'a', selectedSeason: 2024 })
+    expect(dashboardReducer(state, { type: 'selectSeason', season: 2024, players: data })).toEqual({
+      selectedPlayerId: 'a',
+      selectedSeason: 2024,
+    })
   })
 })
 

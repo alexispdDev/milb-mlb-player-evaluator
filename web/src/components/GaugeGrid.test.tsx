@@ -7,8 +7,7 @@ import GaugeGrid from './GaugeGrid'
 const profiles = playerProfilesSchema.parse(players)
 const metrics = profiles[0].metrics
 
-const titles = () =>
-  screen.getAllByTestId('gauge-card-title').map((el) => el.textContent)
+const titles = () => screen.getAllByTestId('gauge-card-title').map((el) => el.textContent)
 
 describe('GaugeGrid', () => {
   it('renders 8 cards for the first player', () => {

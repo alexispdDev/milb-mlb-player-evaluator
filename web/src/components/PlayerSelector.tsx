@@ -1,10 +1,5 @@
 import { useState } from 'react'
-import {
-  Combobox,
-  ComboboxInput,
-  ComboboxOption,
-  ComboboxOptions,
-} from '@headlessui/react'
+import { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react'
 import { FOCUS_RING } from './focusRing'
 import { filterPlayers, type PlayerSummary } from '../data/loadPlayers'
 
@@ -17,8 +12,7 @@ interface PlayerSelectorProps {
 function PlayerSelector({ players, selectedId, onSelect }: PlayerSelectorProps) {
   const [query, setQuery] = useState('')
   const filtered = filterPlayers(players, query)
-  const nameOf = (id: string | null) =>
-    players.find((p) => p.id === id)?.fullName ?? ''
+  const nameOf = (id: string | null) => players.find((p) => p.id === id)?.fullName ?? ''
 
   return (
     <div data-testid="player-selector" className="relative w-64 max-w-full">
@@ -39,10 +33,7 @@ function PlayerSelector({ players, selectedId, onSelect }: PlayerSelectorProps) 
         />
         <ComboboxOptions className="absolute left-0 top-full z-10 mt-1 max-h-60 w-full overflow-auto rounded border border-subtext bg-card text-foreground shadow-lg">
           {filtered.length === 0 ? (
-            <div
-              data-testid="player-selector-empty"
-              className="px-2 py-1 text-subtext"
-            >
+            <div data-testid="player-selector-empty" className="px-2 py-1 text-subtext">
               {`No player found matching '${query}'`}
             </div>
           ) : (

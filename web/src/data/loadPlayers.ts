@@ -8,9 +8,7 @@ export type LoadError = {
   message: string
 }
 
-export type LoadResult =
-  | { ok: true; players: PlayerProfile[] }
-  | { ok: false; error: LoadError }
+export type LoadResult = { ok: true; players: PlayerProfile[] } | { ok: false; error: LoadError }
 
 function fail(kind: LoadError['kind'], message: string): LoadResult {
   return { ok: false, error: { kind, message } }
@@ -64,10 +62,7 @@ export function getProfile(
   return profiles.find((p) => p.id === playerId && p.season === season)
 }
 
-export function filterPlayers(
-  list: PlayerSummary[],
-  query: string,
-): PlayerSummary[] {
+export function filterPlayers(list: PlayerSummary[], query: string): PlayerSummary[] {
   const q = query.trim().toLowerCase()
   if (q === '') return [...list]
   return list.filter((p) => p.fullName.toLowerCase().includes(q))

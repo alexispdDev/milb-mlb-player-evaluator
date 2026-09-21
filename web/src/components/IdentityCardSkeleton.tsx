@@ -1,8 +1,4 @@
-import {
-  IDENTITY_CARD_MIN_HEIGHT,
-  IDENTITY_CARD_WRAPPER,
-  PULSE,
-} from './skeletonDimensions'
+import { IDENTITY_CARD_MIN_HEIGHT, IDENTITY_CARD_WRAPPER, PULSE } from './skeletonDimensions'
 
 function IdentityCardSkeleton() {
   return (

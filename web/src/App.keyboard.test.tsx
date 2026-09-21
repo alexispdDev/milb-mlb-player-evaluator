@@ -31,20 +31,16 @@ const custom: LoadResult = {
   ],
 }
 
-const FOCUSABLE =
-  'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
+const FOCUSABLE = 'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
 
 function focusables(root: HTMLElement) {
   return Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
     (el) =>
-      !el.hasAttribute('disabled') &&
-      !el.closest('[aria-hidden="true"]') &&
-      !el.closest('[inert]'),
+      !el.hasAttribute('disabled') && !el.closest('[aria-hidden="true"]') && !el.closest('[inert]'),
   )
 }
 
-const gaugeValues = () =>
-  screen.getAllByTestId('gauge-card-value').map((e) => e.textContent)
+const gaugeValues = () => screen.getAllByTestId('gauge-card-value').map((e) => e.textContent)
 
 describe('keyboard flow: tab order', () => {
   it('puts the combobox first, then the season radios, and nothing after', () => {
@@ -80,7 +76,12 @@ describe('keyboard flow: tab order', () => {
   it('a sized chart renders an svg and still has no tabindex="0" (accessibilityLayer off)', () => {
     // Inside App, ResponsiveContainer renders nothing in jsdom, so render the card with fixed size.
     const { container } = render(
-      <RollingTrendChartCard trend={base[0].trend} width={400} height={200} isAnimationActive={false} />,
+      <RollingTrendChartCard
+        trend={base[0].trend}
+        width={400}
+        height={200}
+        isAnimationActive={false}
+      />,
     )
     expect(container.querySelector('svg.recharts-surface')).not.toBeNull()
     expect(container.querySelector('[tabindex="0"]')).toBeNull()
@@ -133,7 +134,9 @@ describe('keyboard-only integration', () => {
     await screen.findByRole('listbox')
     fireEvent.keyDown(input, { key: 'ArrowDown' })
     fireEvent.keyDown(input, { key: 'Enter' })
-    expect(await screen.findByText('Name b', { selector: '[data-testid="player-name"]' })).toBeInTheDocument()
+    expect(
+      await screen.findByText('Name b', { selector: '[data-testid="player-name"]' }),
+    ).toBeInTheDocument()
     expect(gaugeValues()).not.toEqual(beforeGauges)
     expect(screen.getByTestId('trend-header')).toHaveTextContent(/^B/)
   })

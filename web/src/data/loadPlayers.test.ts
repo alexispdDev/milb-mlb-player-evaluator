@@ -1,12 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import fixture from './players.json'
-import {
-  filterPlayers,
-  getProfile,
-  listPlayers,
-  loadPlayers,
-  type LoadResult,
-} from './loadPlayers'
+import { filterPlayers, getProfile, listPlayers, loadPlayers, type LoadResult } from './loadPlayers'
 import { playerProfileSchema, type PlayerProfile } from './schema'
 
 const clone = () => structuredClone(fixture) as Record<string, unknown>[]
@@ -88,9 +82,7 @@ describe('loadPlayers', () => {
 
   it('accepts a null metric value', () => {
     const players = ok(loadPlayers())
-    expect(
-      players.some((p) => p.metrics.some((m) => m.value === null)),
-    ).toBe(true)
+    expect(players.some((p) => p.metrics.some((m) => m.value === null))).toBe(true)
   })
 
   it('does not mutate input', () => {
@@ -168,9 +160,7 @@ describe('filterPlayers', () => {
     expect(names('FREE')).toEqual(['Freddie Freeman'])
     expect(names('  freeman ')).toEqual(['Freddie Freeman'])
     expect(names('eddie f')).toEqual(['Freddie Freeman'])
-    expect(names('rodriguez-cast')).toEqual([
-      'Bartholomew Rodriguez-Castellanos',
-    ])
+    expect(names('rodriguez-cast')).toEqual(['Bartholomew Rodriguez-Castellanos'])
   })
 
   it('preserves input order', () => {

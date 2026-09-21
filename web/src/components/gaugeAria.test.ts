@@ -24,16 +24,10 @@ describe('buildGaugeAriaLabel', () => {
   it.each([
     ['barrel_rate', 'Barrel Percentage: 12.8 percent, League Average: 8.5 percent'],
     ['hard_hit_rate', 'Hard-Hit Percentage: 49.2 percent, League Average: 39.8 percent'],
-    [
-      'avg_ev',
-      'Average Exit Velocity: 91.5 miles per hour, League Average: 88.9 miles per hour',
-    ],
+    ['avg_ev', 'Average Exit Velocity: 91.5 miles per hour, League Average: 88.9 miles per hour'],
     ['avg_la', 'Average Launch Angle: 14.2 degrees, League Average: 12.3 degrees'],
     ['sweet_spot_rate', 'Sweet Spot Percentage: 38.1 percent, League Average: 33.2 percent'],
-    [
-      'max_ev',
-      'Maximum Exit Velocity: 113.3 miles per hour, League Average: 109.6 miles per hour',
-    ],
+    ['max_ev', 'Maximum Exit Velocity: 113.3 miles per hour, League Average: 109.6 miles per hour'],
     ['whiff_rate', 'Whiff Percentage: 18.5 percent, League Average: 23.0 percent'],
     ['chase_rate', 'Chase Percentage: 24.0 percent, League Average: 28.4 percent'],
   ])('%s', (id, expected) => {
@@ -47,9 +41,9 @@ describe('buildGaugeAriaLabel', () => {
   })
 
   it('N/A when value is null but percentile is a number', () => {
-    expect(buildGaugeAriaLabel({ ...base, id: 'max_ev', unit: 'MPH', value: null, percentile: 40 })).toBe(
-      'Maximum Exit Velocity: not available, League Average: 2300.0 miles per hour',
-    )
+    expect(
+      buildGaugeAriaLabel({ ...base, id: 'max_ev', unit: 'MPH', value: null, percentile: 40 }),
+    ).toBe('Maximum Exit Velocity: not available, League Average: 2300.0 miles per hour')
   })
 
   it('N/A when value is a number but percentile is null', () => {
@@ -59,9 +53,7 @@ describe('buildGaugeAriaLabel', () => {
   })
 
   it('unknown id falls back to title-cased name; unknown unit is used as-is', () => {
-    expect(buildGaugeAriaLabel(base)).toBe(
-      'Foo Bar: 2400.0 RPM, League Average: 2300.0 RPM',
-    )
+    expect(buildGaugeAriaLabel(base)).toBe('Foo Bar: 2400.0 RPM, League Average: 2300.0 RPM')
   })
 
   it('empty unit gives no trailing space', () => {

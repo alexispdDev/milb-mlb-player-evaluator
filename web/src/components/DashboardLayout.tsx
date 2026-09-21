@@ -20,10 +20,7 @@ function DashboardLayout({
 }: DashboardLayoutProps) {
   return (
     <div className="min-h-screen bg-background">
-      <TopNavigation
-        playerSelector={playerSelector}
-        seasonToggle={seasonToggle}
-      />
+      <TopNavigation playerSelector={playerSelector} seasonToggle={seasonToggle} />
       <main className="mx-auto flex max-w-[1440px] flex-col gap-6 p-6">
         {identity}
         {gauges}

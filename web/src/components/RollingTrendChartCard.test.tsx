@@ -24,12 +24,7 @@ const planTrend: Trend = {
 
 function renderCard(trend: Trend) {
   return render(
-    <RollingTrendChartCard
-      trend={trend}
-      width={600}
-      height={280}
-      isAnimationActive={false}
-    />,
+    <RollingTrendChartCard trend={trend} width={600} height={280} isAnimationActive={false} />,
   )
 }
 
@@ -38,9 +33,7 @@ describe('RollingTrendChartCard', () => {
     renderCard(planTrend)
     const card = screen.getByTestId('trend-card')
     expect(card).toHaveClass('bg-card', 'text-foreground')
-    expect(screen.getByTestId('trend-header')).toHaveTextContent(
-      'Hard-Hit% Rolling (Last 50 PA)',
-    )
+    expect(screen.getByTestId('trend-header')).toHaveTextContent('Hard-Hit% Rolling (Last 50 PA)')
     expect(screen.getByTestId('trend-chart')).toHaveAttribute('role', 'img')
     expect(screen.getByTestId('trend-chart')).toHaveAttribute(
       'aria-label',
@@ -59,9 +52,7 @@ describe('RollingTrendChartCard', () => {
     const { container } = renderCard(first.trend)
     expect(first.trend.points.length).toBeGreaterThanOrEqual(7)
     expect(first.trend.points.at(-1)!.pa).toBe(first.summary.plateAppearances)
-    expect(container.querySelectorAll('.recharts-line-dot')).toHaveLength(
-      first.trend.points.length,
-    )
+    expect(container.querySelectorAll('.recharts-line-dot')).toHaveLength(first.trend.points.length)
   })
 
   it('shows the tooltip text on hover', async () => {

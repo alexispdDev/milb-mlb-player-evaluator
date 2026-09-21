@@ -7,9 +7,7 @@ import PlayerIdentityCard from './PlayerIdentityCard'
 const profiles = playerProfilesSchema.parse(players)
 
 function findProfile(fullName: string, season: number): PlayerProfile {
-  const profile = profiles.find(
-    (p) => p.identity.fullName === fullName && p.season === season,
-  )
+  const profile = profiles.find((p) => p.identity.fullName === fullName && p.season === season)
   if (!profile) throw new Error(`fixture profile not found: ${fullName} ${season}`)
   return profile
 }
@@ -23,14 +21,8 @@ describe('PlayerIdentityCard', () => {
     render(<PlayerIdentityCard profile={freeman} />)
 
     expect(screen.getByTestId('identity-card')).toHaveClass('bg-card')
-    expect(screen.getByTestId('headshot')).toHaveAttribute(
-      'src',
-      freeman.identity.headshotUrl,
-    )
-    expect(screen.getByTestId('headshot')).toHaveAttribute(
-      'alt',
-      'Freddie Freeman headshot',
-    )
+    expect(screen.getByTestId('headshot')).toHaveAttribute('src', freeman.identity.headshotUrl)
+    expect(screen.getByTestId('headshot')).toHaveAttribute('alt', 'Freddie Freeman headshot')
     expect(screen.queryByTestId('initials-fallback')).not.toBeInTheDocument()
     expect(screen.getByTestId('team-badge')).toHaveTextContent('LAD')
 
@@ -84,10 +76,7 @@ describe('PlayerIdentityCard', () => {
     rerender(<PlayerIdentityCard profile={bartholomew} />)
 
     expect(screen.queryByTestId('initials-fallback')).not.toBeInTheDocument()
-    expect(screen.getByTestId('headshot')).toHaveAttribute(
-      'src',
-      bartholomew.identity.headshotUrl,
-    )
+    expect(screen.getByTestId('headshot')).toHaveAttribute('src', bartholomew.identity.headshotUrl)
   })
 
   it('applies truncation and a title attribute to long names while keeping the full text in the DOM', () => {

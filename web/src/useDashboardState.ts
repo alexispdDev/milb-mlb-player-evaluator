@@ -17,9 +17,7 @@ export function seasonsFor(players: PlayerProfile[], id: string): number[] {
   return [...seasons].sort((a, b) => a - b)
 }
 
-export function initialDashboardState(
-  players: PlayerProfile[],
-): DashboardState {
+export function initialDashboardState(players: PlayerProfile[]): DashboardState {
   const first = listPlayers(players)[0]
   if (!first) return { selectedPlayerId: '', selectedSeason: 0 }
   const seasons = seasonsFor(players, first.id)
@@ -29,10 +27,7 @@ export function initialDashboardState(
   }
 }
 
-export function dashboardReducer(
-  state: DashboardState,
-  action: DashboardAction,
-): DashboardState {
+export function dashboardReducer(state: DashboardState, action: DashboardAction): DashboardState {
   switch (action.type) {
     case 'selectPlayer': {
       const seasons = seasonsFor(action.players, action.id)
@@ -40,10 +35,7 @@ export function dashboardReducer(
       const selectedSeason = seasons.includes(state.selectedSeason)
         ? state.selectedSeason
         : seasons[seasons.length - 1]
-      if (
-        action.id === state.selectedPlayerId &&
-        selectedSeason === state.selectedSeason
-      ) {
+      if (action.id === state.selectedPlayerId && selectedSeason === state.selectedSeason) {
         return state
       }
       return { selectedPlayerId: action.id, selectedSeason }
@@ -61,20 +53,12 @@ export function dashboardReducer(
 }
 
 export function useDashboardState(players: PlayerProfile[]) {
-  const [state, dispatch] = useReducer(
-    dashboardReducer,
-    players,
-    initialDashboardState,
-  )
+  const [state, dispatch] = useReducer(dashboardReducer, players, initialDashboardState)
   const seasons = useMemo(
     () => seasonsFor(players, state.selectedPlayerId),
     [players, state.selectedPlayerId],
   )
-  const profile = getProfile(
-    players,
-    state.selectedPlayerId,
-    state.selectedSeason,
-  )
+  const profile = getProfile(players, state.selectedPlayerId, state.selectedSeason)
   const selectPlayer = useCallback(
     (id: string) => dispatch({ type: 'selectPlayer', id, players }),
     [players],

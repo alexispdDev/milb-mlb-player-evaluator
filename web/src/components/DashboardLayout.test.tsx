@@ -31,12 +31,8 @@ describe('DashboardLayout', () => {
         seasonToggle={<span data-testid="s" />}
       />,
     )
-    expect(screen.getByTestId('player-selector-slot')).toContainElement(
-      screen.getByTestId('p'),
-    )
-    expect(screen.getByTestId('season-toggle-slot')).toContainElement(
-      screen.getByTestId('s'),
-    )
+    expect(screen.getByTestId('player-selector-slot')).toContainElement(screen.getByTestId('p'))
+    expect(screen.getByTestId('season-toggle-slot')).toContainElement(screen.getByTestId('s'))
   })
 
   it('renders children inside main', () => {

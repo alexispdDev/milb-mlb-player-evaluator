@@ -1,8 +1,5 @@
 import { useState } from 'react'
-import {
-  IDENTITY_CARD_MIN_HEIGHT,
-  IDENTITY_CARD_WRAPPER,
-} from './skeletonDimensions'
+import { IDENTITY_CARD_MIN_HEIGHT, IDENTITY_CARD_WRAPPER } from './skeletonDimensions'
 import type { Identity, PlayerProfile, Summary } from '../data/schema'
 
 function getInitials(fullName: string): string {
@@ -94,7 +91,10 @@ function SummaryStatsBar({ summary }: { summary: Summary }) {
 
 function PlayerIdentityCard({ profile }: { profile: PlayerProfile }) {
   return (
-    <div data-testid="identity-card" className={`${IDENTITY_CARD_WRAPPER} ${IDENTITY_CARD_MIN_HEIGHT}`}>
+    <div
+      data-testid="identity-card"
+      className={`${IDENTITY_CARD_WRAPPER} ${IDENTITY_CARD_MIN_HEIGHT}`}
+    >
       <div className="flex min-w-0 items-center gap-4">
         <HeadshotFrame key={profile.identity.headshotUrl} identity={profile.identity} />
         <PlayerBio identity={profile.identity} />

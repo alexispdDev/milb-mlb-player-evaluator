@@ -24,10 +24,7 @@ function CardHeader({ name }: { name: string }) {
 function MetricValueDisplay({ text }: { text: string }) {
   return (
     <div aria-hidden="true" className="absolute inset-x-0 bottom-0 flex justify-center">
-      <span
-        data-testid="gauge-card-value"
-        className="text-xl font-bold text-foreground"
-      >
+      <span data-testid="gauge-card-value" className="text-xl font-bold text-foreground">
         {text}
       </span>
     </div>
@@ -76,9 +73,7 @@ function StatcastGaugeCard({ metric }: StatcastGaugeCardProps) {
           <MetricValueDisplay text={formatMetricValue(value, metric.unit)} />
         )}
       </div>
-      <LeagueBenchmarkDisplay
-        text={`Avg: ${formatMetricValue(metric.leagueAvg, metric.unit)}`}
-      />
+      <LeagueBenchmarkDisplay text={`Avg: ${formatMetricValue(metric.leagueAvg, metric.unit)}`} />
     </div>
   )
 }

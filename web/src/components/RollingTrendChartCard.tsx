@@ -8,11 +8,7 @@ import {
   YAxis,
 } from 'recharts'
 import type { PlayerProfile } from '../data/schema'
-import {
-  CHART_HEIGHT,
-  TREND_CARD_MIN_HEIGHT,
-  TREND_CARD_WRAPPER,
-} from './skeletonDimensions'
+import { CHART_HEIGHT, TREND_CARD_MIN_HEIGHT, TREND_CARD_WRAPPER } from './skeletonDimensions'
 import { formatTrendTooltip } from './trendFormat'
 
 type Trend = PlayerProfile['trend']
@@ -31,10 +27,7 @@ const TICK = { fill: 'var(--color-subtext)', fontSize: 12 }
 
 function ChartHeader({ name }: { name: string }) {
   return (
-    <h3
-      data-testid="trend-header"
-      className="text-sm font-semibold text-foreground"
-    >
+    <h3 data-testid="trend-header" className="text-sm font-semibold text-foreground">
       {name}
     </h3>
   )
@@ -98,16 +91,8 @@ function TrendLineChart({
           fontSize: 12,
         }}
       />
-      <YAxis
-        domain={['auto', 'auto']}
-        tick={TICK}
-        axisLine={AXIS_LINE}
-        tickLine={AXIS_LINE}
-      />
-      <Tooltip
-        content={TrendTooltipContent}
-        cursor={{ stroke: 'var(--color-subtext)' }}
-      />
+      <YAxis domain={['auto', 'auto']} tick={TICK} axisLine={AXIS_LINE} tickLine={AXIS_LINE} />
+      <Tooltip content={TrendTooltipContent} cursor={{ stroke: 'var(--color-subtext)' }} />
       <Line
         type="monotone"
         dataKey="value"
@@ -144,10 +129,7 @@ function RollingTrendChartCard({
   height,
 }: RollingTrendChartCardProps) {
   return (
-    <div
-      data-testid="trend-card"
-      className={`${TREND_CARD_WRAPPER} ${TREND_CARD_MIN_HEIGHT}`}
-    >
+    <div data-testid="trend-card" className={`${TREND_CARD_WRAPPER} ${TREND_CARD_MIN_HEIGHT}`}>
       <ChartHeader name={trend.metricName} />
       {trend.points.length === 0 ? (
         <p data-testid="trend-empty" className="text-sm text-subtext">

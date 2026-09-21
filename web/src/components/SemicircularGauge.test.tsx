@@ -183,7 +183,12 @@ describe('SemicircularGauge', () => {
 
     it('puts the transition in classes, not inline style, and leaves arc and track static', () => {
       render(<SemicircularGauge percentile={50} />)
-      for (const c of ['transition-transform', 'duration-700', 'ease-out', 'motion-reduce:transition-none']) {
+      for (const c of [
+        'transition-transform',
+        'duration-700',
+        'ease-out',
+        'motion-reduce:transition-none',
+      ]) {
         expect(needle()).toHaveClass(c)
       }
       expect(needle().getAttribute('style')).not.toMatch(/transition/)

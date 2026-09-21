@@ -8,11 +8,7 @@ interface GaugeGridProps {
 
 function GaugeGrid({ metrics }: GaugeGridProps) {
   return (
-    <section
-      aria-label="Statcast metrics"
-      data-testid="gauge-grid"
-      className={GAUGE_GRID_CLASSES}
-    >
+    <section aria-label="Statcast metrics" data-testid="gauge-grid" className={GAUGE_GRID_CLASSES}>
       {metrics.map((metric) => (
         <StatcastGaugeCard key={metric.id} metric={metric} />
       ))}

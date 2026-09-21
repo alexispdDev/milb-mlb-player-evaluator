@@ -7,12 +7,7 @@ import { playerProfilesSchema, type PlayerProfile } from './data/schema'
 
 const base = playerProfilesSchema.parse(fixture)
 
-function make(
-  id: string,
-  season: number,
-  value: number,
-  trendName: string,
-): PlayerProfile {
+function make(id: string, season: number, value: number, trendName: string): PlayerProfile {
   const src = base[0]
   return {
     ...src,
@@ -40,8 +35,7 @@ async function choosePlayer(name: string) {
   fireEvent.click(option)
 }
 
-const chartLabel = () =>
-  screen.getByTestId('trend-chart').getAttribute('aria-label')
+const chartLabel = () => screen.getByTestId('trend-chart').getAttribute('aria-label')
 
 const custom = [
   make('a', 2024, 11, 'A24'),
@@ -61,12 +55,10 @@ describe('App', () => {
     expect(seasonRadio('2025')).toBeChecked()
     expect(screen.getByTestId('gauge-grid')).toBeInTheDocument()
     const p2025 = base.find((p) => p.id === base[0].id && p.season === 2025)!
-    expect(screen.getByTestId('trend-header')).toHaveTextContent(
-      p2025.trend.metricName,
-    )
+    expect(screen.getByTestId('trend-header')).toHaveTextContent(p2025.trend.metricName)
   })
 
-  it('lists every player once and the selected player\'s seasons', async () => {
+  it("lists every player once and the selected player's seasons", async () => {
     render(<App />)
     openList()
     await screen.findAllByRole('option')
@@ -76,9 +68,7 @@ describe('App', () => {
     const expected = [...new Set(base.map((p) => p.identity.fullName))]
     expect(names).toEqual(expected)
     // The open combobox marks the rest of the page inert, hence hidden: true.
-    const seasons = within(
-      screen.getByRole('radiogroup', { name: 'Season', hidden: true }),
-    )
+    const seasons = within(screen.getByRole('radiogroup', { name: 'Season', hidden: true }))
       .getAllByRole('radio', { hidden: true })
       .map((r) => (r as HTMLInputElement).value)
     expect(seasons).toEqual(['2024', '2025'])
@@ -90,9 +80,7 @@ describe('App', () => {
     const before = screen.getAllByTestId('gauge-card-value')[0].textContent
     await choosePlayer('Name b')
     expect(screen.getByTestId('player-name')).toHaveTextContent('Name b')
-    expect(screen.getAllByTestId('gauge-card-value')[0].textContent).not.toBe(
-      before,
-    )
+    expect(screen.getAllByTestId('gauge-card-value')[0].textContent).not.toBe(before)
     expect(chartLabel()).toContain('B25')
     expect(screen.getByTestId('trend-header')).toHaveTextContent('B25')
   })
@@ -130,12 +118,8 @@ describe('App', () => {
     expect(seasons).toEqual(['2024'])
   })
 
-  it('defaults to the first player and that player\'s own latest season', () => {
-    render(
-      <App
-        loadResult={ok([make('a', 2024, 1, 'A24'), make('b', 2025, 2, 'B25')])}
-      />,
-    )
+  it("defaults to the first player and that player's own latest season", () => {
+    render(<App loadResult={ok([make('a', 2024, 1, 'A24'), make('b', 2025, 2, 'B25')])} />)
     expect(screen.getByTestId('player-name')).toHaveTextContent('Name a')
     expect(seasonRadio('2024')).toBeChecked()
   })
@@ -147,9 +131,7 @@ describe('App', () => {
 
   it('shows header and banner only when loading failed', () => {
     render(<App loadResult={failure('invalid-schema')} />)
-    expect(screen.getByTestId('app-brand')).toHaveTextContent(
-      'MLB Hitter Analytics Portal',
-    )
+    expect(screen.getByTestId('app-brand')).toHaveTextContent('MLB Hitter Analytics Portal')
     expect(screen.getByTestId('load-error-banner')).toBeInTheDocument()
     expect(screen.getByTestId('player-selector-slot')).toBeEmptyDOMElement()
     expect(screen.getByTestId('season-toggle-slot')).toBeEmptyDOMElement()
@@ -157,17 +139,12 @@ describe('App', () => {
     expect(screen.queryByRole('radiogroup')).toBeNull()
     for (const id of ['gauge-grid', 'identity-card', 'trend-card'])
       expect(screen.queryByTestId(id)).not.toBeInTheDocument()
-    expect(screen.getByRole('main')).toContainElement(
-      screen.getByTestId('load-error-banner'),
-    )
+    expect(screen.getByRole('main')).toContainElement(screen.getByTestId('load-error-banner'))
   })
 
   it.each([
     ['invalid-schema', 'The player data file is not in the expected format.'],
-    [
-      'duplicate-profile',
-      'The player data contains the same player and season more than once.',
-    ],
+    ['duplicate-profile', 'The player data contains the same player and season more than once.'],
     ['empty', 'The player data file contains no players.'],
   ] as const)('renders the sentence for %s', (kind, sentence) => {
     render(<App loadResult={failure(kind)} />)

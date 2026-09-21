@@ -30,8 +30,7 @@ function setup(selectedId = 'a') {
   return { input: input as HTMLInputElement, onSelect }
 }
 
-const optionTexts = () =>
-  screen.queryAllByRole('option').map((o) => o.textContent)
+const optionTexts = () => screen.queryAllByRole('option').map((o) => o.textContent)
 
 describe('PlayerSelector', () => {
   it('shows the selected name and a closed list initially', () => {
@@ -52,7 +51,10 @@ describe('PlayerSelector', () => {
 
   it('lists all players when opened without typing', async () => {
     const { input } = setup()
-    { input.focus(); fireEvent.click(input) }
+    {
+      input.focus()
+      fireEvent.click(input)
+    }
     await waitFor(() => expect(optionTexts()).toEqual(players.map((p) => p.fullName)))
     expect(screen.getAllByTestId('player-selector-option')).toHaveLength(3)
     expect(screen.getByRole('option', { name: 'Freddie Freeman' })).toHaveAttribute(
@@ -63,7 +65,10 @@ describe('PlayerSelector', () => {
 
   it('calls onSelect once when an option is clicked and closes', async () => {
     const { input, onSelect } = setup()
-    { input.focus(); fireEvent.click(input) }
+    {
+      input.focus()
+      fireEvent.click(input)
+    }
     // Headless UI selects an option on mousedown, so simulate the full click.
     const option = await screen.findByRole('option', { name: 'Mookie Betts' })
     fireEvent.mouseDown(option)
@@ -112,7 +117,10 @@ describe('PlayerSelector', () => {
       expect(screen.queryByTestId('player-selector-empty')).not.toBeInTheDocument(),
     )
     expect(input.value).toBe('Freddie Freeman')
-    { input.focus(); fireEvent.click(input) }
+    {
+      input.focus()
+      fireEvent.click(input)
+    }
     await waitFor(() => expect(optionTexts()).toHaveLength(3))
   })
 
@@ -149,7 +157,10 @@ describe('PlayerSelector', () => {
     expect(LONG).toHaveLength(33)
     const { input } = setup('c')
     expect(input.value).toBe(LONG)
-    { input.focus(); fireEvent.click(input) }
+    {
+      input.focus()
+      fireEvent.click(input)
+    }
     expect(await screen.findByRole('option', { name: LONG })).toBeInTheDocument()
   })
 

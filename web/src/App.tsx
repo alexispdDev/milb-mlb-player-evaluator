@@ -27,13 +27,7 @@ function ErrorView({ kind }: { kind?: LoadErrorType['kind'] }) {
   )
 }
 
-function Dashboard({
-  players,
-  loading,
-}: {
-  players: PlayerProfile[]
-  loading: boolean
-}) {
+function Dashboard({ players, loading }: { players: PlayerProfile[]; loading: boolean }) {
   const state = useDashboardState(players)
   const { profile } = state
   if (!profile) return <ErrorView />
@@ -53,17 +47,9 @@ function Dashboard({
           onSelect={state.selectSeason}
         />
       }
-      identity={
-        loading ? <IdentityCardSkeleton /> : <PlayerIdentityCard profile={profile} />
-      }
+      identity={loading ? <IdentityCardSkeleton /> : <PlayerIdentityCard profile={profile} />}
       gauges={loading ? <GaugeGridSkeleton /> : <GaugeGrid metrics={profile.metrics} />}
-      trend={
-        loading ? (
-          <TrendChartSkeleton />
-        ) : (
-          <RollingTrendChartCard trend={profile.trend} />
-        )
-      }
+      trend={loading ? <TrendChartSkeleton /> : <RollingTrendChartCard trend={profile.trend} />}
     />
   )
 }

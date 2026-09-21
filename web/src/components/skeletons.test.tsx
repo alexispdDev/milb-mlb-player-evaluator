@@ -30,9 +30,7 @@ describe('skeletons', () => {
     const real = screen.getByTestId('identity-card')
     expect(real.className).toContain(dims.IDENTITY_CARD_MIN_HEIGHT)
     expect(real.className).toContain(dims.IDENTITY_CARD_WRAPPER)
-    pulseBlocks(sk).forEach((b) =>
-      expect(b.className).toContain('motion-safe:animate-pulse'),
-    )
+    pulseBlocks(sk).forEach((b) => expect(b.className).toContain('motion-safe:animate-pulse'))
   })
 
   it('gauge grid skeleton has 8 cards and the real grid classes', () => {
@@ -50,9 +48,7 @@ describe('skeletons', () => {
     expect(card.className).toContain(dims.GAUGE_CARD_MIN_HEIGHT)
     expect(card.className).toContain(dims.GAUGE_CARD_WRAPPER)
     expect(pulseBlocks(card).length).toBeGreaterThan(0)
-    pulseBlocks(card).forEach((b) =>
-      expect(b.className).toContain('motion-safe:animate-pulse'),
-    )
+    pulseBlocks(card).forEach((b) => expect(b.className).toContain('motion-safe:animate-pulse'))
   })
 
   it('real gauge grid and card use the shared constants', () => {
@@ -71,12 +67,8 @@ describe('skeletons', () => {
     expect(sk.className).toContain(dims.TREND_CARD_MIN_HEIGHT)
     expect(sk.className).toContain(dims.TREND_CARD_WRAPPER)
     expect(sk.innerHTML).toContain(dims.CHART_HEIGHT_CLASS)
-    pulseBlocks(sk).forEach((b) =>
-      expect(b.className).toContain('motion-safe:animate-pulse'),
-    )
-    render(
-      <RollingTrendChartCard trend={profile.trend} width={400} height={dims.CHART_HEIGHT} />,
-    )
+    pulseBlocks(sk).forEach((b) => expect(b.className).toContain('motion-safe:animate-pulse'))
+    render(<RollingTrendChartCard trend={profile.trend} width={400} height={dims.CHART_HEIGHT} />)
     const real = screen.getByTestId('trend-card')
     expect(real.className).toContain(dims.TREND_CARD_MIN_HEIGHT)
     expect(real.className).toContain(dims.TREND_CARD_WRAPPER)

@@ -8,8 +8,7 @@ interface LoadErrorBannerProps {
 
 const sentences: Record<LoadError['kind'], string> = {
   'invalid-schema': 'The player data file is not in the expected format.',
-  'duplicate-profile':
-    'The player data contains the same player and season more than once.',
+  'duplicate-profile': 'The player data contains the same player and season more than once.',
   empty: 'The player data file contains no players.',
 }
 

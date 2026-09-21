@@ -11,9 +11,7 @@ import SeasonToggle from './SeasonToggle'
 
 function setup(seasons: number[], selected: number) {
   const onSelect = vi.fn()
-  render(
-    <SeasonToggle seasons={seasons} selected={selected} onSelect={onSelect} />,
-  )
+  render(<SeasonToggle seasons={seasons} selected={selected} onSelect={onSelect} />)
   return onSelect
 }
 

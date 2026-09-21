@@ -46,9 +46,7 @@ describe('StatcastGaugeCard', () => {
   it('formats MPH and degree units', () => {
     const { unmount } = render(<StatcastGaugeCard metric={fixture('avg_ev')} />)
     expect(screen.getByTestId('gauge-card-value')).toHaveTextContent(/^91\.5 MPH$/)
-    expect(screen.getByTestId('gauge-card-benchmark')).toHaveTextContent(
-      /^Avg: 88\.9 MPH$/,
-    )
+    expect(screen.getByTestId('gauge-card-benchmark')).toHaveTextContent(/^Avg: 88\.9 MPH$/)
     unmount()
     render(<StatcastGaugeCard metric={fixture('avg_la')} />)
     expect(screen.getByTestId('gauge-card-value')).toHaveTextContent(/^14\.2°$/)
@@ -67,11 +65,7 @@ describe('StatcastGaugeCard', () => {
   })
 
   it('colors above-average inverted blue', () => {
-    render(
-      <StatcastGaugeCard
-        metric={{ ...base, value: 30, leagueAvg: 23, inverted: true }}
-      />,
-    )
+    render(<StatcastGaugeCard metric={{ ...base, value: 30, leagueAvg: 23, inverted: true }} />)
     expect(stroke()).toBe('var(--color-below)')
   })
 
@@ -87,10 +81,7 @@ describe('StatcastGaugeCard', () => {
 
   it('passes percentile to the gauge', () => {
     render(<StatcastGaugeCard metric={{ ...base, percentile: 50 }} />)
-    expect(screen.getByTestId('gauge-needle')).toHaveAttribute(
-      'transform',
-      'rotate(90 100 100)',
-    )
+    expect(screen.getByTestId('gauge-needle')).toHaveAttribute('transform', 'rotate(90 100 100)')
   })
 
   describe.each([
