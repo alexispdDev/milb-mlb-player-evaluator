@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { GAUGE_VIEWBOX, gaugeArcPath, percentileToAngle } from './gaugeMath'
 
 interface SemicircularGaugeProps {
@@ -6,7 +7,16 @@ interface SemicircularGaugeProps {
 }
 
 function SemicircularGauge({ percentile, color }: SemicircularGaugeProps) {
-  if (percentile === null) {
+  const angle = percentile === null ? null : percentileToAngle(percentile)
+  const [displayedAngle, setDisplayedAngle] = useState(0)
+
+  useEffect(() => {
+    if (angle === null) return
+    const frame = requestAnimationFrame(() => setDisplayedAngle(angle))
+    return () => cancelAnimationFrame(frame)
+  }, [angle])
+
+  if (percentile === null || angle === null) {
     return (
       <svg data-testid="gauge" viewBox={GAUGE_VIEWBOX} width="100%" aria-hidden="true">
         <path
@@ -21,7 +31,6 @@ function SemicircularGauge({ percentile, color }: SemicircularGaugeProps) {
       </svg>
     )
   }
-  const angle = percentileToAngle(percentile)
   return (
     <svg data-testid="gauge" viewBox={GAUGE_VIEWBOX} width="100%" aria-hidden="true">
       <path
@@ -51,6 +60,8 @@ function SemicircularGauge({ percentile, color }: SemicircularGaugeProps) {
         strokeWidth="3"
         strokeLinecap="round"
         transform={`rotate(${angle} 100 100)`}
+        className="transition-transform duration-700 ease-out motion-reduce:transition-none"
+        style={{ transform: `rotate(${displayedAngle}deg)`, transformOrigin: '100px 100px' }}
       />
     </svg>
   )

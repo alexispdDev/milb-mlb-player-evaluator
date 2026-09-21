@@ -1,4 +1,6 @@
-import { render, screen } from '@testing-library/react'
+import { StrictMode } from 'react'
+import { act, render, screen } from '@testing-library/react'
+import { renderToString } from 'react-dom/server'
 import SemicircularGauge from './SemicircularGauge'
 import { gaugeArcPath } from './gaugeMath'
 
@@ -87,10 +89,117 @@ describe('SemicircularGauge', () => {
     expect([track().getAttribute('stroke'), needle().getAttribute('stroke')]).toEqual(before)
   })
 
-  it('has no text, animation or card styling', () => {
+  it('has no text, keyframe animation or card styling', () => {
     const { container } = render(<SemicircularGauge percentile={60} color="red" />)
     expect(container.querySelector('text')).toBeNull()
-    expect(container.innerHTML).not.toMatch(/transition|animation|keyframes|bg-card|padding|border/i)
+    expect(container.innerHTML).not.toMatch(/animation|keyframes|bg-card|padding|border/i)
+  })
+
+  describe('needle sweep', () => {
+    let queue: Map<number, FrameRequestCallback>
+    let nextId: number
+    const flush = () =>
+      act(() => {
+        const cbs = [...queue.values()]
+        queue.clear()
+        cbs.forEach((cb) => cb(0))
+      })
+
+    beforeEach(() => {
+      queue = new Map()
+      nextId = 1
+      vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
+        const id = nextId++
+        queue.set(id, cb)
+        return id
+      })
+      vi.stubGlobal('cancelAnimationFrame', (id: number) => {
+        queue.delete(id)
+      })
+    })
+    afterEach(() => {
+      vi.unstubAllGlobals()
+    })
+
+    it('first render (no effects) is at rotate(0deg) with the final angle in the attribute', () => {
+      const html = renderToString(<SemicircularGauge percentile={50} />)
+      const doc = new DOMParser().parseFromString(html, 'text/html')
+      const n = doc.querySelector('[data-testid="gauge-needle"]')!
+      expect(n.getAttribute('style')).toMatch(/transform:\s*rotate\(0deg\)/)
+      expect(n.getAttribute('style')).toMatch(/transform-origin:\s*100px 100px/)
+      expect(n.getAttribute('transform')).toBe('rotate(90 100 100)')
+    })
+
+    it.each([
+      [0, 0],
+      [25, 45],
+      [50, 90],
+      [100, 180],
+    ])('moves to the target after the frame for percentile %s', (p, deg) => {
+      render(<SemicircularGauge percentile={p} />)
+      expect(needle().style.transform).toBe('rotate(0deg)')
+      flush()
+      expect(needle().style.transform).toBe(`rotate(${deg}deg)`)
+      expect(needle().style.transformOrigin).toBe('100px 100px')
+      expect(needle()).toHaveAttribute('transform', `rotate(${deg} 100 100)`)
+    })
+
+    it('keeps the same needle node and sweeps from the old angle on change', () => {
+      const { rerender } = render(<SemicircularGauge percentile={25} />)
+      flush()
+      const before = needle()
+      expect(before.style.transform).toBe('rotate(45deg)')
+      rerender(<SemicircularGauge percentile={75} />)
+      expect(needle()).toBe(before)
+      expect(needle().style.transform).toBe('rotate(45deg)')
+      expect(needle()).toHaveAttribute('transform', 'rotate(135 100 100)')
+      flush()
+      expect(needle().style.transform).toBe('rotate(135deg)')
+    })
+
+    it('reaches the final state after a StrictMode effect double-invoke', () => {
+      render(
+        <StrictMode>
+          <SemicircularGauge percentile={50} />
+        </StrictMode>,
+      )
+      flush()
+      expect(needle().style.transform).toBe('rotate(90deg)')
+    })
+
+    it('cancels the pending frame on unmount without warnings', () => {
+      const err = vi.spyOn(console, 'error').mockImplementation(() => {})
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      const { unmount } = render(<SemicircularGauge percentile={50} />)
+      expect(queue.size).toBe(1)
+      unmount()
+      expect(queue.size).toBe(0)
+      expect(() => flush()).not.toThrow()
+      expect(err).not.toHaveBeenCalled()
+      expect(warn).not.toHaveBeenCalled()
+      err.mockRestore()
+      warn.mockRestore()
+    })
+
+    it('puts the transition in classes, not inline style, and leaves arc and track static', () => {
+      render(<SemicircularGauge percentile={50} />)
+      for (const c of ['transition-transform', 'duration-700', 'ease-out', 'motion-reduce:transition-none']) {
+        expect(needle()).toHaveClass(c)
+      }
+      expect(needle().getAttribute('style')).not.toMatch(/transition/)
+      for (const el of [arc(), track()]) {
+        expect(el.getAttribute('class')).toBeNull()
+        expect(el.getAttribute('style')).toBeNull()
+      }
+      expect(arc()).toHaveAttribute('d', gaugeArcPath(0, 90))
+    })
+
+    it('N/A mode has no transition classes or transform styles', () => {
+      const { container } = render(<SemicircularGauge percentile={null} />)
+      expect(container.innerHTML).not.toMatch(/transition-|duration-/)
+      expect(container.querySelector('[style*="transform"]')).toBeNull()
+      expect(queue.size).toBe(0)
+    })
   })
 
   describe('null percentile (N/A mode)', () => {
