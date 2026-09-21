@@ -19,13 +19,21 @@ does not wait for them.
 
 Command: `. ~/.nvm/nvm.sh && cd web && npm run build` (run 2026-09-21).
 
-| Asset | Raw | Gzip |
-|---|---|---|
-| `dist/index.html` | 0.47 kB | 0.31 kB |
-| `dist/assets/index-*.css` | 16.32 kB | 4.21 kB |
-| `dist/assets/index-*.js` | 809.72 kB | 242.07 kB |
+Measured after the build with `stat -c %s` (raw) and `gzip -c FILE | wc -c`
+(gzip, default level 6). Sizes are in bytes; 1 kB = 1000 bytes. The gzip
+figures come from the `gzip` command, so they can differ slightly from the
+gzip kB that Vite prints (Vite reports 0.31, 4.21 and 242.07 kB).
 
-These are the only files in `dist/`. The build warns "Some chunks are larger
+| Asset | Raw (bytes) | Gzip (bytes) |
+|---|---|---|
+| `dist/index.html` | 477 | 320 |
+| `dist/favicon.svg` | 9522 | 1516 |
+| `dist/assets/index-*.css` | 16324 | 4227 |
+| `dist/assets/index-*.js` | 809724 | 239407 |
+
+`dist/favicon.svg` is copied unhashed from `web/public/`; files in
+`web/public/` are copied as they are and Vite does not list them in its
+output. The table above is every file in `dist/`. The build warns "Some chunks are larger
 than 500 kB after minification" because Recharts is in the single JS chunk.
 That is a risk to the TTI budget and is tracked in #29. Sizes are
 documentation only: no test asserts them, because they change with every
