@@ -33,8 +33,15 @@ dependency bump and the plan has no bundle budget.
 
 ## Player switch: PROXY
 
-Test: `web/src/App.perf.test.tsx`, run with
-`cd web && npx vitest run src/App.perf.test.tsx`.
+Test: `web/src/App.perf.test.tsx`. To see the printed median and max, run:
+
+```
+cd web && npx vitest run src/App.perf.test.tsx --silent=false --reporter=verbose 2>&1 | grep "PROXY switch"
+```
+
+Plain `npx vitest run src/App.perf.test.tsx` hides the `console.info` line
+(`--silent=false` alone also printed nothing with the default reporter here; the
+verbose reporter shows it). Pass/fail alone needs no flags.
 
 - Renders `App` with the bundled fixture in jsdom.
 - 5 warm-up switches, then 20 measured switches, alternating a player switch
@@ -44,19 +51,19 @@ Test: `web/src/App.perf.test.tsx`, run with
 - Asserts the MEDIAN is under the ceiling of **100 ms** (median, not mean or a
   single sample, so WSL noise does not cause false failures).
 
-Results on the engineer's machine (WSL2), 2026-09-21:
+Results on the engineer's machine (WSL2), 2026-09-21, five consecutive runs
+with the command above (after the season assertion was added):
 
 | Run | Median | Max | Result |
 |---|---|---|---|
-| 1 | 4.6 ms | 7.3 ms | pass |
-| 2 | 4.7 ms | 6.8 ms | pass |
-| 3 | 4.5 ms | 6.7 ms | pass |
-| 4 | 4.6 ms | 7.1 ms | pass |
-| 5 | 4.3 ms | 6.3 ms | pass |
+| 1 | 4.5 ms | 7.3 ms | pass |
+| 2 | 4.6 ms | 7.6 ms | pass |
+| 3 | 4.5 ms | 7.4 ms | pass |
+| 4 | 4.7 ms | 8.2 ms | pass |
+| 5 | 4.7 ms | 7.4 ms | pass |
 
-Five earlier consecutive runs of the same test also passed (pass/fail only; the
-median was not printed in that batch). The full suite (`npm test`, 27 files, 274
-tests) passes with the perf test included. The 100 ms ceiling was not widened.
+The full suite (`npm test`) passes with the perf test included. The 100 ms
+ceiling was not widened.
 
 Limits of the proxy:
 

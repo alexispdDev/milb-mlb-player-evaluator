@@ -43,9 +43,14 @@ async function timedPlayerSwitch(name: string): Promise<number> {
 
 function timedSeasonSwitch(year: string): number {
   const radio = screen.getByRole('radio', { name: year })
+  // The target must differ from the current season, or the click is a no-op.
+  expect(radio).not.toBeChecked()
   const start = performance.now()
   fireEvent.click(radio)
-  return performance.now() - start
+  const ms = performance.now() - start
+  // Guard against timing a no-op (asserted after the timing is captured).
+  expect(radio).toBeChecked()
+  return ms
 }
 
 describe('App performance', () => {
