@@ -17,6 +17,8 @@ does not wait for them.
 
 ## Build sizes
 
+### Before (2026-09-21, single JS chunk)
+
 Command: `. ~/.nvm/nvm.sh && cd web && npm run build` (run 2026-09-21).
 
 Measured after the build with `stat -c %s` (raw) and `gzip -c FILE | wc -c`
@@ -43,10 +45,49 @@ gzip kB that Vite prints (Vite reports 0.31, 4.21 and 242.07 kB).
 `dist/favicon.svg` and the files under `dist/assets/logos/` and
 `dist/assets/players/` are copied unhashed from `web/public/`; files in
 `web/public/` are copied as they are and Vite does not list them in its
-output. The table above is every file in `dist/` (`find dist -type f`). The build warns "Some chunks are larger
-than 500 kB after minification" because Recharts is in the single JS chunk.
-That is a risk to the TTI budget and is tracked in #29. Sizes are
-documentation only: no test asserts them, because they change with every
+output. The table above is every file in `dist/` (`find dist -type f`). At the
+time of this table the build warned "Some chunks are larger than 500 kB after
+minification" because Recharts was in the single JS chunk, a risk to the TTI
+budget. That warning was resolved by #29 (see the "After" table below).
+
+### After (2026-09-21, #29: trend chart lazy-loaded)
+
+`RollingTrendChartCard` (the only importer of Recharts) is loaded with
+`React.lazy`, so it is its own chunk. Command:
+`. ~/.nvm/nvm.sh && cd web && npm run build`. Build output lines:
+
+```
+dist/index.html                                  0.47 kB │ gzip:   0.31 kB
+dist/assets/index-B5P8LApl.css                  16.32 kB │ gzip:   4.21 kB
+dist/assets/RollingTrendChartCard-1KwwwMlK.js  353.67 kB │ gzip: 102.72 kB
+dist/assets/index-DeIBglJs.js                  457.03 kB │ gzip: 140.22 kB
+```
+
+There is no "Some chunks are larger than 500 kB" warning. Every file from
+`find dist -type f`, measured with `stat -c %s` and `gzip -c FILE | wc -c`:
+
+| Asset | Raw (bytes) | Gzip (bytes) |
+|---|---|---|
+| `dist/index.html` | 477 | 320 |
+| `dist/favicon.svg` | 9522 | 1516 |
+| `dist/assets/index-*.css` | 16324 | 4227 |
+| `dist/assets/index-*.js` (React + app) | 457035 | 138791 |
+| `dist/assets/RollingTrendChartCard-*.js` (Recharts) | 353678 | 101433 |
+| `dist/assets/logos/cle.svg` | 310 | 251 |
+| `dist/assets/logos/det.svg` | 316 | 254 |
+| `dist/assets/logos/lad.svg` | 307 | 242 |
+| `dist/assets/logos/nyy.svg` | 324 | 246 |
+| `dist/assets/logos/sea.svg` | 327 | 260 |
+| `dist/assets/players/518692.png` | 199 | 157 |
+| `dist/assets/players/642008.png` | 199 | 157 |
+| `dist/assets/players/670541.png` | 199 | 156 |
+| `dist/assets/players/681177.png` | 199 | 159 |
+
+JS totals (bytes, raw / gzip): before 809724 / 239407 (one chunk), after
+810713 / 240224 (457035 + 353678 raw, 138791 + 101433 gzip). The total is
+about the same; the gain is that the initial (main) chunk drops from 809724 to
+457035 raw bytes (239407 to 138791 gzip) and the chart chunk is fetched when the
+chart is first shown. Sizes are documentation only: no test asserts them, because they change with every
 dependency bump and the plan has no bundle budget.
 
 ## Player switch: PROXY
@@ -61,7 +102,9 @@ Plain `npx vitest run src/App.perf.test.tsx` hides the `console.info` line
 (`--silent=false` alone also printed nothing with the default reporter here; the
 verbose reporter shows it). Pass/fail alone needs no flags.
 
-- Renders `App` with the bundled fixture in jsdom.
+- Renders `App` with the bundled fixture in jsdom and waits for the lazy chart
+  chunk (`trend-card`) before timing anything (#29), so the chunk load is not
+  part of the switch time.
 - 5 warm-up switches, then 20 measured switches, alternating a player switch
   (through the combobox) with a season switch (radio). Each switch is wrapped in
   `performance.now()` around the synchronous `fireEvent` calls, so it covers
@@ -119,7 +162,8 @@ prints in Chrome.
 
 For every budget later measured FAIL, the person who measured it files a
 follow-up GitHub issue with `gh issue create` and links it here. The >500 kB
-chunk warning is already filed as #29. No budget was measured FAIL in this task
+chunk warning was filed as #29 and is resolved (see the "After" build table).
+No budget was measured FAIL in this task
 (the proxy passed), so no new follow-up issue was filed.
 
 ## Known unverified
@@ -138,5 +182,9 @@ Checklist for a human with a browser (`npm run preview`). None of this blocks
   (clearly N/A, no needle or broken arc).
 - [ ] Error banner (#17, #21): it is red and its text is readable against the
   background.
+- [ ] Lazy chart (#29): on a real network (DevTools throttling, e.g. Fast 4G) the
+  first load time with the split chunks is acceptable, and the switch from the
+  trend skeleton to the chart shows no visible flash or layout jump. Not
+  measured here (needs a browser).
 - [ ] Skeleton (#15): skeleton dimensions match the loaded layout, so nothing
   jumps when the real content appears.

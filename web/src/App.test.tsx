@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import App from './App'
 import fixture from './data/players.json'
@@ -49,11 +49,12 @@ const seasonGroup = () => screen.getByRole('radiogroup', { name: 'Season' })
 const seasonRadio = (year: string) => screen.getByRole('radio', { name: year })
 
 describe('App', () => {
-  it('shows Freddie Freeman 2025 from the bundled fixture on load', () => {
+  it('shows Freddie Freeman 2025 from the bundled fixture on load', async () => {
     render(<App />)
     expect(screen.getByTestId('player-name')).toHaveTextContent('Freddie Freeman')
     expect(seasonRadio('2025')).toBeChecked()
     expect(screen.getByTestId('gauge-grid')).toBeInTheDocument()
+    await screen.findByTestId('trend-card')
     const p2025 = base.find((p) => p.id === base[0].id && p.season === 2025)!
     expect(screen.getByTestId('trend-header')).toHaveTextContent(p2025.trend.metricName)
   })
@@ -76,6 +77,7 @@ describe('App', () => {
 
   it('updates identity, gauges and trend when the player changes', async () => {
     render(<App loadResult={ok(custom)} />)
+    await screen.findByTestId('trend-card')
     expect(screen.getByTestId('player-name')).toHaveTextContent('Name a')
     const before = screen.getAllByTestId('gauge-card-value')[0].textContent
     await choosePlayer('Name b')
@@ -85,8 +87,9 @@ describe('App', () => {
     expect(screen.getByTestId('trend-header')).toHaveTextContent('B25')
   })
 
-  it('updates the same sections when the season changes', () => {
+  it('updates the same sections when the season changes', async () => {
     render(<App loadResult={ok(custom)} />)
+    await screen.findByTestId('trend-card')
     expect(chartLabel()).toContain('A25')
     fireEvent.click(seasonRadio('2024'))
     expect(screen.getByTestId('player-name')).toHaveTextContent('Name a')
@@ -102,6 +105,7 @@ describe('App', () => {
 
   it('falls back to the latest season for a player lacking the season', async () => {
     render(<App loadResult={ok(custom)} />)
+    await screen.findByTestId('trend-card')
     await choosePlayer('Name c')
     expect(seasonRadio('2024')).toBeChecked()
     expect(screen.getByTestId('player-name')).toHaveTextContent('Name c')
@@ -165,21 +169,25 @@ describe('App loading', () => {
   const skeletonIds = ['skeleton-identity', 'skeleton-gauge-grid', 'skeleton-trend']
   const realIds = ['identity-card', 'gauge-grid', 'trend-card']
 
-  it('shows skeletons only, keeps nav, and swaps back to real content', () => {
+  it('shows skeletons only, keeps nav, and swaps back to real content', async () => {
     const { rerender } = render(<App loading />)
     skeletonIds.forEach((id) => expect(screen.getByTestId(id)).toBeInTheDocument())
     realIds.forEach((id) => expect(screen.queryByTestId(id)).toBeNull())
     expect(screen.getAllByTestId('skeleton-gauge-card').length).toBe(8)
     expect(screen.getByRole('combobox', { name: 'Player' })).toBeInTheDocument()
     rerender(<App loading={false} />)
+    await screen.findByTestId('trend-card')
+    await waitFor(() => expect(screen.queryByTestId('skeleton-trend')).toBeNull())
     skeletonIds.forEach((id) => expect(screen.queryByTestId(id)).toBeNull())
     expect(screen.queryByTestId('skeleton-gauge-card')).toBeNull()
     realIds.forEach((id) => expect(screen.getByTestId(id)).toBeInTheDocument())
     expect(screen.getAllByTestId('gauge-card').length).toBe(8)
   })
 
-  it('does not show skeletons by default', () => {
+  it('does not show skeletons by default', async () => {
     render(<App />)
+    // Until the chart chunk resolves the trend skeleton is legitimately shown.
+    await screen.findByTestId('trend-card')
     skeletonIds.forEach((id) => expect(screen.queryByTestId(id)).toBeNull())
   })
 

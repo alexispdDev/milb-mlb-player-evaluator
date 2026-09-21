@@ -1,10 +1,10 @@
+import { lazy, Suspense } from 'react'
 import DashboardLayout from './components/DashboardLayout'
 import GaugeGrid from './components/GaugeGrid'
 import GaugeGridSkeleton from './components/GaugeGridSkeleton'
 import IdentityCardSkeleton from './components/IdentityCardSkeleton'
 import TrendChartSkeleton from './components/TrendChartSkeleton'
 import PlayerIdentityCard from './components/PlayerIdentityCard'
-import RollingTrendChartCard from './components/RollingTrendChartCard'
 import PlayerSelector from './components/PlayerSelector'
 import SeasonToggle from './components/SeasonToggle'
 import LoadErrorBanner from './components/LoadErrorBanner'
@@ -16,6 +16,9 @@ import {
 } from './data/loadPlayers'
 import type { PlayerProfile } from './data/schema'
 import { useDashboardState } from './useDashboardState'
+
+// Recharts lives only in this chunk, so it is not part of the main bundle.
+const RollingTrendChartCard = lazy(() => import('./components/RollingTrendChartCard'))
 
 const defaultLoadResult: LoadResult = loadPlayers()
 
@@ -49,7 +52,15 @@ function Dashboard({ players, loading }: { players: PlayerProfile[]; loading: bo
       }
       identity={loading ? <IdentityCardSkeleton /> : <PlayerIdentityCard profile={profile} />}
       gauges={loading ? <GaugeGridSkeleton /> : <GaugeGrid metrics={profile.metrics} />}
-      trend={loading ? <TrendChartSkeleton /> : <RollingTrendChartCard trend={profile.trend} />}
+      trend={
+        loading ? (
+          <TrendChartSkeleton />
+        ) : (
+          <Suspense fallback={<TrendChartSkeleton />}>
+            <RollingTrendChartCard trend={profile.trend} />
+          </Suspense>
+        )
+      }
     />
   )
 }

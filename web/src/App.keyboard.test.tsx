@@ -43,8 +43,9 @@ function focusables(root: HTMLElement) {
 const gaugeValues = () => screen.getAllByTestId('gauge-card-value').map((e) => e.textContent)
 
 describe('keyboard flow: tab order', () => {
-  it('puts the combobox first, then the season radios, and nothing after', () => {
+  it('puts the combobox first, then the season radios, and nothing after', async () => {
     const { container } = render(<App />)
+    await screen.findByTestId('trend-card')
     const list = focusables(container)
     const combobox = screen.getByRole('combobox', { name: 'Player' })
     const radios = screen.getAllByRole('radio')
@@ -68,8 +69,9 @@ describe('keyboard flow: tab order', () => {
     // jsdom cannot verify the single tab stop (checked radio only) nor native arrow keys.
   })
 
-  it('the trend chart has no tabindex="0" element', () => {
+  it('the trend chart has no tabindex="0" element', async () => {
     render(<App />)
+    await screen.findByTestId('trend-card')
     expect(screen.getByTestId('trend-chart').querySelector('[tabindex="0"]')).toBeNull()
   })
 
@@ -89,8 +91,9 @@ describe('keyboard flow: tab order', () => {
 })
 
 describe('keyboard flow: no focus traps', () => {
-  it('has no positive tabindex, autofocus, dialog roles or aria-modal', () => {
+  it('has no positive tabindex, autofocus, dialog roles or aria-modal', async () => {
     const { container } = render(<App />)
+    await screen.findByTestId('trend-card')
     const all = Array.from(container.querySelectorAll('*'))
     expect(all.filter((e) => Number(e.getAttribute('tabindex')) > 0)).toEqual([])
     expect(container.querySelector('[autofocus]')).toBeNull()
@@ -126,6 +129,7 @@ describe('keyboard flow: no focus traps', () => {
 describe('keyboard-only integration', () => {
   it('selects another player with ArrowDown / Enter on the combobox', async () => {
     render(<App loadResult={custom} />)
+    await screen.findByTestId('trend-card')
     expect(screen.getByTestId('player-name')).toHaveTextContent('Name a')
     const beforeGauges = gaugeValues()
     const input = screen.getByRole('combobox', { name: 'Player' })
@@ -141,8 +145,9 @@ describe('keyboard-only integration', () => {
     expect(screen.getByTestId('trend-header')).toHaveTextContent(/^B/)
   })
 
-  it('switches season through the radio group', () => {
+  it('switches season through the radio group', async () => {
     render(<App loadResult={custom} />)
+    await screen.findByTestId('trend-card')
     const before = gaugeValues()
     const group = screen.getByRole('radiogroup', { name: 'Season' })
     fireEvent.keyDown(group, { key: 'ArrowRight' })

@@ -13,6 +13,8 @@ const options = {
 describe('App accessibility (axe)', () => {
   it('default profile has no violations', async () => {
     const { container } = render(<App />)
+    // Wait for the lazy chart so axe checks the real chart card, not the skeleton.
+    await screen.findByTestId('trend-card')
     expect(await axe(container, options)).toHaveNoViolations()
   })
 
@@ -30,6 +32,7 @@ describe('App accessibility (axe)', () => {
         name: 'Maximum Exit Velocity: not available, League Average: 109.8 miles per hour',
       }),
     ).toBeInTheDocument()
+    await screen.findByTestId('trend-card')
     expect(await axe(container, options)).toHaveNoViolations()
   })
 

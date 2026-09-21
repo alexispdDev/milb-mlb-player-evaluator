@@ -56,6 +56,8 @@ function timedSeasonSwitch(year: string): number {
 describe('App performance', () => {
   it(`PROXY: median player/season switch in jsdom is under ${CEILING_MS} ms`, async () => {
     render(<App />)
+    // The lazy chart chunk load is not part of the switch time.
+    await screen.findByTestId('trend-card')
     const samples: number[] = []
     let year = 2025
     for (let i = 0; i < WARMUP + MEASURED; i++) {
