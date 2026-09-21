@@ -7,6 +7,7 @@ interface DashboardLayoutProps {
   identity?: ReactNode
   gauges?: ReactNode
   trend?: ReactNode
+  children?: ReactNode
 }
 
 function DashboardLayout({
@@ -15,6 +16,7 @@ function DashboardLayout({
   identity,
   gauges,
   trend,
+  children,
 }: DashboardLayoutProps) {
   return (
     <div className="min-h-screen bg-background">
@@ -26,6 +28,7 @@ function DashboardLayout({
         {identity}
         {gauges}
         {trend}
+        {children}
       </main>
     </div>
   )

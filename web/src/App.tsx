@@ -7,19 +7,23 @@ import PlayerIdentityCard from './components/PlayerIdentityCard'
 import RollingTrendChartCard from './components/RollingTrendChartCard'
 import PlayerSelector from './components/PlayerSelector'
 import SeasonToggle from './components/SeasonToggle'
-import { listPlayers, loadPlayers, type LoadResult } from './data/loadPlayers'
+import LoadErrorBanner from './components/LoadErrorBanner'
+import {
+  listPlayers,
+  loadPlayers,
+  type LoadError as LoadErrorType,
+  type LoadResult,
+} from './data/loadPlayers'
 import type { PlayerProfile } from './data/schema'
 import { useDashboardState } from './useDashboardState'
 
 const defaultLoadResult: LoadResult = loadPlayers()
 
-function LoadError() {
+function ErrorView({ kind }: { kind?: LoadErrorType['kind'] }) {
   return (
-    <main>
-      <div role="alert" data-testid="load-error-placeholder">
-        Unable to load player data.
-      </div>
-    </main>
+    <DashboardLayout>
+      <LoadErrorBanner kind={kind} />
+    </DashboardLayout>
   )
 }
 
@@ -32,7 +36,7 @@ function Dashboard({
 }) {
   const state = useDashboardState(players)
   const { profile } = state
-  if (!profile) return <LoadError />
+  if (!profile) return <ErrorView />
   return (
     <DashboardLayout
       playerSelector={
@@ -71,7 +75,7 @@ function App({
   loadResult?: LoadResult
   loading?: boolean
 }) {
-  if (!loadResult.ok) return <LoadError />
+  if (!loadResult.ok) return <ErrorView kind={loadResult.error.kind} />
   return <Dashboard players={loadResult.players} loading={loading} />
 }
 

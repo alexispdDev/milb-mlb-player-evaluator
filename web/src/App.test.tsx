@@ -140,22 +140,47 @@ describe('App', () => {
     expect(seasonRadio('2024')).toBeChecked()
   })
 
-  it('shows only the error placeholder when loading failed', () => {
-    render(
-      <App
-        loadResult={{
-          ok: false,
-          error: { kind: 'empty', message: 'Player data contains no players.' },
-        }}
-      />,
+  const failure = (kind: 'invalid-schema' | 'duplicate-profile' | 'empty'): LoadResult => ({
+    ok: false,
+    error: { kind, message: 'x' },
+  })
+
+  it('shows header and banner only when loading failed', () => {
+    render(<App loadResult={failure('invalid-schema')} />)
+    expect(screen.getByTestId('app-brand')).toHaveTextContent(
+      'MLB Hitter Analytics Portal',
     )
-    expect(screen.getByTestId('load-error-placeholder')).toHaveTextContent(
-      'Unable to load player data.',
+    expect(screen.getByTestId('load-error-banner')).toBeInTheDocument()
+    expect(screen.getByTestId('player-selector-slot')).toBeEmptyDOMElement()
+    expect(screen.getByTestId('season-toggle-slot')).toBeEmptyDOMElement()
+    expect(screen.queryByRole('combobox')).toBeNull()
+    expect(screen.queryByRole('radiogroup')).toBeNull()
+    for (const id of ['gauge-grid', 'identity-card', 'trend-card'])
+      expect(screen.queryByTestId(id)).not.toBeInTheDocument()
+    expect(screen.getByRole('main')).toContainElement(
+      screen.getByTestId('load-error-banner'),
     )
-    expect(screen.getByRole('alert')).toBeInTheDocument()
-    expect(screen.queryByTestId('gauge-grid')).not.toBeInTheDocument()
-    expect(screen.queryByTestId('identity-card')).not.toBeInTheDocument()
-    expect(screen.queryByTestId('trend-card')).not.toBeInTheDocument()
+  })
+
+  it.each([
+    ['invalid-schema', 'The player data file is not in the expected format.'],
+    [
+      'duplicate-profile',
+      'The player data contains the same player and season more than once.',
+    ],
+    ['empty', 'The player data file contains no players.'],
+  ] as const)('renders the sentence for %s', (kind, sentence) => {
+    render(<App loadResult={failure(kind)} />)
+    expect(screen.getByTestId('load-error-banner')).toHaveTextContent(sentence)
+  })
+
+  it('shows the generic banner when the selected profile is missing', () => {
+    render(<App loadResult={ok([])} />)
+    expect(screen.getByTestId('app-brand')).toBeInTheDocument()
+    expect(screen.getByTestId('load-error-banner')).toHaveTextContent(
+      'Something went wrong while preparing the dashboard.',
+    )
+    expect(screen.queryByTestId('gauge-grid')).toBeNull()
   })
 })
 
@@ -190,7 +215,7 @@ describe('App loading', () => {
 
   it('load error wins over loading', () => {
     render(<App loading loadResult={{ ok: false, error: 'x' } as unknown as LoadResult} />)
-    expect(screen.getByRole('alert')).toBeInTheDocument()
+    expect(screen.getByTestId('load-error-banner')).toBeInTheDocument()
     skeletonIds.forEach((id) => expect(screen.queryByTestId(id)).toBeNull())
   })
 })

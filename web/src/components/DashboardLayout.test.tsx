@@ -38,4 +38,13 @@ describe('DashboardLayout', () => {
       screen.getByTestId('s'),
     )
   })
+
+  it('renders children inside main', () => {
+    render(
+      <DashboardLayout>
+        <div data-testid="c" />
+      </DashboardLayout>,
+    )
+    expect(screen.getByRole('main')).toContainElement(screen.getByTestId('c'))
+  })
 })
