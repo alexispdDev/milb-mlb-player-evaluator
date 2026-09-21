@@ -7,6 +7,7 @@ import TrendChartSkeleton from './components/TrendChartSkeleton'
 import PlayerIdentityCard from './components/PlayerIdentityCard'
 import PlayerSelector from './components/PlayerSelector'
 import SeasonToggle from './components/SeasonToggle'
+import ChartErrorBoundary from './components/ChartErrorBoundary'
 import LoadErrorBanner from './components/LoadErrorBanner'
 import {
   listPlayers,
@@ -56,9 +57,11 @@ function Dashboard({ players, loading }: { players: PlayerProfile[]; loading: bo
         loading ? (
           <TrendChartSkeleton />
         ) : (
-          <Suspense fallback={<TrendChartSkeleton />}>
-            <RollingTrendChartCard trend={profile.trend} />
-          </Suspense>
+          <ChartErrorBoundary>
+            <Suspense fallback={<TrendChartSkeleton />}>
+              <RollingTrendChartCard trend={profile.trend} />
+            </Suspense>
+          </ChartErrorBoundary>
         )
       }
     />

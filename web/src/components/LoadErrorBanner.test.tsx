@@ -70,4 +70,35 @@ describe('LoadErrorBanner', () => {
     )
     expect(banner.outerHTML).not.toMatch(/#[0-9a-fA-F]{3,8}\b/)
   })
+
+  describe('chart variant', () => {
+    it('shows the chart heading, sentence, testids and role', () => {
+      render(<LoadErrorBanner variant="chart" />)
+      const banner = screen.getByTestId('chart-error-banner')
+      expect(banner).toHaveAttribute('role', 'alert')
+      expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent(
+        'The trend chart could not be loaded.',
+      )
+      expect(banner).toHaveTextContent('Reload the application to try again.')
+      expect(banner).toHaveClass('border-above', 'bg-card', 'text-above-text')
+      expect(screen.queryByTestId('load-error-banner')).toBeNull()
+      expect(screen.queryByText('Player data could not be loaded.')).toBeNull()
+    })
+
+    it('ignores kind', () => {
+      render(<LoadErrorBanner variant="chart" kind="empty" />)
+      expect(screen.getByTestId('chart-error-banner')).not.toHaveTextContent(sentences.empty)
+    })
+
+    it('has a real Reload button that calls onReload once', () => {
+      const onReload = vi.fn()
+      render(<LoadErrorBanner variant="chart" onReload={onReload} />)
+      const button = screen.getByRole('button', { name: 'Reload Application' })
+      expect(button).toHaveAttribute('type', 'button')
+      expect(button).toHaveAttribute('data-testid', 'chart-error-reload')
+      expect(button).toHaveClass('text-above-text', 'focus-visible:outline-2')
+      fireEvent.click(button)
+      expect(onReload).toHaveBeenCalledTimes(1)
+    })
+  })
 })
