@@ -3,15 +3,24 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
   "scripts": {
+    "predev": "node scripts/check-node.mjs",
     "dev": "vite",
+    "prebuild": "node scripts/check-node.mjs",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
+    "pretest": "node scripts/check-node.mjs",
     "test": "vitest run",
+    "pretest:watch": "node scripts/check-node.mjs",
     "test:watch": "vitest",
+    "prepreview": "node scripts/check-node.mjs",
     "preview": "vite preview",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "precheck": "node scripts/check-node.mjs",
     "check": "npm run lint && npm run format:check && npm test && npm run build"
   },
   "dependencies": {
