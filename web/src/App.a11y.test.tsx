@@ -7,9 +7,6 @@ const options = {
   rules: {
     // jsdom has no layout/paint, so contrast cannot be computed here; real contrast is #21.
     'color-contrast': { enabled: false },
-    // The dashboard is rendered as a fragment inside a test container, not a full page,
-    // so "all content in landmarks" is not meaningful for the container.
-    region: { enabled: false },
   },
 }
 
