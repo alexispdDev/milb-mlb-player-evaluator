@@ -51,11 +51,14 @@ const custom = [
   make('c', 2024, 31, 'C24'),
 ]
 
+const seasonGroup = () => screen.getByRole('radiogroup', { name: 'Season' })
+const seasonRadio = (year: string) => screen.getByRole('radio', { name: year })
+
 describe('App', () => {
   it('shows Freddie Freeman 2025 from the bundled fixture on load', () => {
     render(<App />)
     expect(screen.getByTestId('player-name')).toHaveTextContent('Freddie Freeman')
-    expect(screen.getByLabelText('Season')).toHaveValue('2025')
+    expect(seasonRadio('2025')).toBeChecked()
     expect(screen.getByTestId('gauge-grid')).toBeInTheDocument()
     const p2025 = base.find((p) => p.id === base[0].id && p.season === 2025)!
     expect(screen.getByTestId('trend-header')).toHaveTextContent(
@@ -72,9 +75,12 @@ describe('App', () => {
       .map((o) => o.textContent)
     const expected = [...new Set(base.map((p) => p.identity.fullName))]
     expect(names).toEqual(expected)
-    const seasons = Array.from(
-      screen.getByLabelText('Season').querySelectorAll('option'),
-    ).map((o) => o.textContent)
+    // The open combobox marks the rest of the page inert, hence hidden: true.
+    const seasons = within(
+      screen.getByRole('radiogroup', { name: 'Season', hidden: true }),
+    )
+      .getAllByRole('radio', { hidden: true })
+      .map((r) => (r as HTMLInputElement).value)
     expect(seasons).toEqual(['2024', '2025'])
   })
 
@@ -94,9 +100,7 @@ describe('App', () => {
   it('updates the same sections when the season changes', () => {
     render(<App loadResult={ok(custom)} />)
     expect(chartLabel()).toContain('A25')
-    fireEvent.change(screen.getByLabelText('Season'), {
-      target: { value: '2024' },
-    })
+    fireEvent.click(seasonRadio('2024'))
     expect(screen.getByTestId('player-name')).toHaveTextContent('Name a')
     expect(chartLabel()).toContain('A24')
     expect(screen.getAllByTestId('gauge-card-value')[0]).toHaveTextContent('11')
@@ -105,13 +109,13 @@ describe('App', () => {
   it('keeps the selected season when switching to a player who has it', async () => {
     render(<App loadResult={ok(custom)} />)
     await choosePlayer('Name b')
-    expect(screen.getByLabelText('Season')).toHaveValue('2025')
+    expect(seasonRadio('2025')).toBeChecked()
   })
 
   it('falls back to the latest season for a player lacking the season', async () => {
     render(<App loadResult={ok(custom)} />)
     await choosePlayer('Name c')
-    expect(screen.getByLabelText('Season')).toHaveValue('2024')
+    expect(seasonRadio('2024')).toBeChecked()
     expect(screen.getByTestId('player-name')).toHaveTextContent('Name c')
     expect(chartLabel()).toContain('C24')
     expect(screen.getAllByTestId('gauge-card-value')[0]).toHaveTextContent('31')
@@ -120,9 +124,9 @@ describe('App', () => {
   it('lists only the single season of a single-season player', async () => {
     render(<App loadResult={ok(custom)} />)
     await choosePlayer('Name c')
-    const seasons = Array.from(
-      screen.getByLabelText('Season').querySelectorAll('option'),
-    ).map((o) => o.textContent)
+    const seasons = within(seasonGroup())
+      .getAllByRole('radio')
+      .map((r) => (r as HTMLInputElement).value)
     expect(seasons).toEqual(['2024'])
   })
 
@@ -133,7 +137,7 @@ describe('App', () => {
       />,
     )
     expect(screen.getByTestId('player-name')).toHaveTextContent('Name a')
-    expect(screen.getByLabelText('Season')).toHaveValue('2024')
+    expect(seasonRadio('2024')).toBeChecked()
   })
 
   it('shows only the error placeholder when loading failed', () => {

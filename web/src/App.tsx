@@ -3,7 +3,7 @@ import GaugeGrid from './components/GaugeGrid'
 import PlayerIdentityCard from './components/PlayerIdentityCard'
 import RollingTrendChartCard from './components/RollingTrendChartCard'
 import PlayerSelector from './components/PlayerSelector'
-import { TempSeasonSelect } from './components/TempDashboardControls'
+import SeasonToggle from './components/SeasonToggle'
 import { listPlayers, loadPlayers, type LoadResult } from './data/loadPlayers'
 import type { PlayerProfile } from './data/schema'
 import { useDashboardState } from './useDashboardState'
@@ -34,10 +34,10 @@ function Dashboard({ players }: { players: PlayerProfile[] }) {
         />
       }
       seasonToggle={
-        <TempSeasonSelect
+        <SeasonToggle
           seasons={state.seasons}
-          selectedSeason={state.selectedSeason}
-          onSelectSeason={state.selectSeason}
+          selected={state.selectedSeason}
+          onSelect={state.selectSeason}
         />
       }
       identity={<PlayerIdentityCard profile={profile} />}
