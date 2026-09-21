@@ -1,3 +1,8 @@
+Documents
+
+- `_docs/process.md` - how work is organized
+- For the json required for the frontend, read `_docs/api.md`
+
 Commands
 
 Run from `web/`.
