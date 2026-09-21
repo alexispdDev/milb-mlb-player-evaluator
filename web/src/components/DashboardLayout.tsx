@@ -1,28 +1,31 @@
+import type { ReactNode } from 'react'
 import TopNavigation from './TopNavigation'
 
-function DashboardLayout() {
+interface DashboardLayoutProps {
+  playerSelector?: ReactNode
+  seasonToggle?: ReactNode
+  identity?: ReactNode
+  gauges?: ReactNode
+  trend?: ReactNode
+}
+
+function DashboardLayout({
+  playerSelector,
+  seasonToggle,
+  identity,
+  gauges,
+  trend,
+}: DashboardLayoutProps) {
   return (
     <div className="min-h-screen bg-background">
-      <TopNavigation />
-      <main className="mx-auto max-w-[1440px] p-6">
-        <div
-          data-testid="identity-card-placeholder"
-          className="rounded bg-card p-4 text-subtext"
-        >
-          Player identity card placeholder
-        </div>
-        <div
-          data-testid="gauge-grid-placeholder"
-          className="mt-6 rounded bg-card p-4 text-subtext"
-        >
-          Gauge grid placeholder
-        </div>
-        <div
-          data-testid="trend-chart-placeholder"
-          className="mt-6 rounded bg-card p-4 text-subtext"
-        >
-          Trend chart placeholder
-        </div>
+      <TopNavigation
+        playerSelector={playerSelector}
+        seasonToggle={seasonToggle}
+      />
+      <main className="mx-auto flex max-w-[1440px] flex-col gap-6 p-6">
+        {identity}
+        {gauges}
+        {trend}
       </main>
     </div>
   )
