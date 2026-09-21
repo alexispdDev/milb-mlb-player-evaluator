@@ -132,8 +132,8 @@ Limits of the proxy:
   recalculation or paint, so it is not a substitute for the DevTools measurement.
 - WSL and shared machines are noisy; that is why the assertion uses the median
   and a ceiling roughly 20 times the observed values.
-- Player switching is currently synchronous over bundled data; real async
-  loading is #28.
+- Player switching is synchronous over bundled data; real async loading is out
+  of scope for v1 (#28, closed as not planned).
 
 ## Manual measurements (human, needs a browser)
 
