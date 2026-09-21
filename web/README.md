@@ -11,14 +11,14 @@ Vitest + React Testing Library + vitest-axe.
 
 - Node 24 is the recommended version: it is what CI runs (from `.nvmrc`). With
   [nvm](https://github.com/nvm-sh/nvm), run `nvm use` in `web/` to select it.
-- The declared range is the `engines.node` value in `package.json`:
-  `^20.19.0 || >=22.12.0`, which is Vite 8's own requirement. Verified in a
-  fresh clone: 22.23.2 and 24.21.0 pass `npm ci` and `npm run check`; 18.20.8 and
-  21.7.3 are rejected by the guard. Caveat: the dev dependency `jsdom` 30 (via
-  `@asamuzakjp/css-color`) requires `^22.22.2 || ^24.15.0 || >=26.0.0`, so on
-  20.20.2 `npm ci` fails with `EBADENGINE` (and with `--engine-strict=false`
-  the test suite cannot load jsdom). Node 20.x and 22.12 to 22.21 are therefore
-  not supported in practice, whatever `engines` says. Use Node 24.
+- The supported range is the `engines.node` value in `package.json`:
+  `^22.22.2 || ^24.15.0 || ^26.0.0`. It is stricter than Vite's own
+  requirement (`^20.19.0 || >=22.12.0`) because the `jsdom` version used by
+  Vitest requires `^22.22.2 || ^24.15.0 || >=26.0.0`, and Vitest itself excludes
+  Node 25. Node 20 and 22.12 to 22.21 therefore cannot run the tests.
+- Verified in a fresh clone (`npm ci` then `npm run check`): 22.22.2, 22.23.2,
+  24.15.0, 24.21.0, 26.0.0 and 26.9.0. Node 27 and later are not verified and
+  not claimed.
 - The range is enforced twice:
   - `.npmrc` sets `engine-strict=true`, so `npm install` / `npm ci` fail
     (`EBADENGINE`) on an unsupported Node.
@@ -124,28 +124,35 @@ requires adding its image files.
 ## CI
 
 `.github/workflows/ci.yml` runs `npm ci` and then `npm run check` from `web/`.
-Node comes from `web/.nvmrc` (24), on pushes to `main` and on pull requests. `npm run check` reproduces it
-locally.
+Node comes from `web/.nvmrc` (24), on pushes to `main` and on pull requests.
+`npm run check` reproduces it locally.
 
 ## Troubleshooting
 
-Symptom, on an unsupported Node such as 18 (before the guard existed, or when the
-guard is bypassed by running `vite` directly):
+Symptom, on an unsupported Node such as 18, when the guard is bypassed by
+running `vite` directly (`node node_modules/vite/bin/vite.js --version` with
+`node_modules` installed by Node 24):
 
 ```text
+file:///.../web/node_modules/rolldown/dist/shared/create-bundler-option-DJpvtSqr.mjs:8
 import { formatWithOptions, styleText } from "node:util";
                             ^^^^^^^^^
 SyntaxError: The requested module 'node:util' does not provide an export named 'styleText'
+    at ModuleJob._instantiate (node:internal/modules/esm/module_job:123:21)
+    at async ModuleJob.run (node:internal/modules/esm/module_job:191:5)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:337:24)
+
+Node.js v18.20.8
 ```
 
-Cause: Node 18 or another unsupported Node (`styleText` needs Node 20.12+, and
-Vite 8 needs `^20.19.0 || >=22.12.0`). Fix: `nvm use` in `web/`, then `npm ci` if
+Cause: an unsupported Node (`styleText` needs Node 20.12+, and the toolchain
+needs the range under Prerequisites). Fix: `nvm use` in `web/`, then `npm ci` if
 `node_modules` was installed with another Node.
 
 The guard message now appears first, before anything else runs:
 
 ```text
-This project needs Node ^20.19.0 || >=22.12.0 (recommended: 24, see .nvmrc); you are running 18.20.8.
+This project needs Node ^22.22.2 || ^24.15.0 || ^26.0.0 (recommended: 24, see .nvmrc); you are running 18.20.8.
 Fix: run `nvm use` in web/ (then `npm ci` if node_modules was installed with another Node).
 ```
 
