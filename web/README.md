@@ -9,17 +9,31 @@ Vitest + React Testing Library + vitest-axe.
 
 ## Prerequisites
 
-- Node 24 is the version CI runs and the version the author verified. No other
-  version was tested.
-- Upstream requirement: Vite 8 itself requires Node `^20.19.0 || >=22.12.0`
-  (from its `engines` field). `package.json` has no `engines` field, so nothing
-  in this repo enforces a Node version.
+- Node 24 is the recommended version: it is what CI runs (from `.nvmrc`). With
+  [nvm](https://github.com/nvm-sh/nvm), run `nvm use` in `web/` to select it.
+- The declared range is the `engines.node` value in `package.json`:
+  `^20.19.0 || >=22.12.0`, which is Vite 8's own requirement. Verified in a
+  fresh clone: 22.23.2 and 24.21.0 pass `npm ci` and `npm run check`; 18.20.8 and
+  21.7.3 are rejected by the guard. Caveat: the dev dependency `jsdom` 30 (via
+  `@asamuzakjp/css-color`) requires `^22.22.2 || ^24.15.0 || >=26.0.0`, so on
+  20.20.2 `npm ci` fails with `EBADENGINE` (and with `--engine-strict=false`
+  the test suite cannot load jsdom). Node 20.x and 22.12 to 22.21 are therefore
+  not supported in practice, whatever `engines` says. Use Node 24.
+- The range is enforced twice:
+  - `.npmrc` sets `engine-strict=true`, so `npm install` / `npm ci` fail
+    (`EBADENGINE`) on an unsupported Node.
+  - A run-time guard, `scripts/check-node.mjs`, runs as the `predev`,
+    `prebuild`, `pretest`, `pretest:watch`, `prepreview` and `precheck` hooks. It
+    catches the case `engine-strict` cannot: `node_modules` installed under a
+    supported Node, then a command run under an unsupported one. It reads the
+    range from `package.json`, prints a two-line message and exits 1.
 
 ## Quick start
 
 Run from `web/`:
 
 ```sh
+nvm use
 npm ci
 npm run dev
 ```
@@ -37,6 +51,9 @@ npm run dev
 | `npm run format`       | Rewrite all files with Prettier (`prettier --write .`).                 |
 | `npm run format:check` | Check formatting with Prettier without changing files.                  |
 | `npm run check`        | `lint` + `format:check` + `test` + `build`, in that order.              |
+
+The `dev`, `build`, `test`, `test:watch`, `preview` and `check` scripts first run
+the Node version guard (see Prerequisites). `lint` and `format*` do not.
 
 Run a single test file:
 
@@ -106,9 +123,34 @@ requires adding its image files.
 
 ## CI
 
-`.github/workflows/ci.yml` runs `npm ci` and then `npm run check` from `web/` on
-Node 24, on pushes to `main` and on pull requests. `npm run check` reproduces it
+`.github/workflows/ci.yml` runs `npm ci` and then `npm run check` from `web/`.
+Node comes from `web/.nvmrc` (24), on pushes to `main` and on pull requests. `npm run check` reproduces it
 locally.
+
+## Troubleshooting
+
+Symptom, on an unsupported Node such as 18 (before the guard existed, or when the
+guard is bypassed by running `vite` directly):
+
+```text
+import { formatWithOptions, styleText } from "node:util";
+                            ^^^^^^^^^
+SyntaxError: The requested module 'node:util' does not provide an export named 'styleText'
+```
+
+Cause: Node 18 or another unsupported Node (`styleText` needs Node 20.12+, and
+Vite 8 needs `^20.19.0 || >=22.12.0`). Fix: `nvm use` in `web/`, then `npm ci` if
+`node_modules` was installed with another Node.
+
+The guard message now appears first, before anything else runs:
+
+```text
+This project needs Node ^20.19.0 || >=22.12.0 (recommended: 24, see .nvmrc); you are running 18.20.8.
+Fix: run `nvm use` in web/ (then `npm ci` if node_modules was installed with another Node).
+```
+
+A plain shell may not load nvm, so `nvm` (or the Node you expect) is missing:
+run `source ~/.nvm/nvm.sh` first.
 
 ## Known limitations and manual checks
 
