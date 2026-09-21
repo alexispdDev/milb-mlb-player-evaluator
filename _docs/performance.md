@@ -30,10 +30,20 @@ gzip kB that Vite prints (Vite reports 0.31, 4.21 and 242.07 kB).
 | `dist/favicon.svg` | 9522 | 1516 |
 | `dist/assets/index-*.css` | 16324 | 4227 |
 | `dist/assets/index-*.js` | 809724 | 239407 |
+| `dist/assets/logos/cle.svg` | 310 | 251 |
+| `dist/assets/logos/det.svg` | 316 | 254 |
+| `dist/assets/logos/lad.svg` | 307 | 242 |
+| `dist/assets/logos/nyy.svg` | 324 | 246 |
+| `dist/assets/logos/sea.svg` | 327 | 260 |
+| `dist/assets/players/518692.png` | 199 | 157 |
+| `dist/assets/players/642008.png` | 199 | 157 |
+| `dist/assets/players/670541.png` | 199 | 156 |
+| `dist/assets/players/681177.png` | 199 | 159 |
 
-`dist/favicon.svg` is copied unhashed from `web/public/`; files in
+`dist/favicon.svg` and the files under `dist/assets/logos/` and
+`dist/assets/players/` are copied unhashed from `web/public/`; files in
 `web/public/` are copied as they are and Vite does not list them in its
-output. The table above is every file in `dist/`. The build warns "Some chunks are larger
+output. The table above is every file in `dist/` (`find dist -type f`). The build warns "Some chunks are larger
 than 500 kB after minification" because Recharts is in the single JS chunk.
 That is a risk to the TTI budget and is tracked in #29. Sizes are
 documentation only: no test asserts them, because they change with every

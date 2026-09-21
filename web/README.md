@@ -98,10 +98,11 @@ In `src/data/schema.ts` (tested by `src/data/schema.test.ts`):
 After editing the fixture, run `npx vitest run src/data/players.test.ts`, then
 `npm test`, which must pass.
 
-`teamLogoUrl` and `headshotUrl` in the fixture are placeholder paths. The image
-files do not exist yet (tracked in
-[#27](https://github.com/alexispdDev/milb-mlb-player-evaluator/issues/27)), so
-editing the fixture does not require adding images.
+`teamLogoUrl` and `headshotUrl` in the fixture must point at files in
+`web/public/assets/`. Those files are generated placeholders (flat shapes and
+flat-colour squares), not real MLB logos or player photos. `src/data/assets.test.ts`
+fails if a fixture URL has no matching file. Adding a fixture player therefore
+requires adding its image files.
 
 ## CI
 
