@@ -12,6 +12,7 @@ const tokens = {
   '--color-above-strong': '#e11d48',
   '--color-below': '#3b82f6',
   '--color-below-strong': '#2563eb',
+  '--color-above-text': '#fb7185',
 }
 
 describe('design tokens', () => {

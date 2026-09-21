@@ -23,7 +23,7 @@ function LoadErrorBanner({
     <div
       role="alert"
       data-testid="load-error-banner"
-      className="flex flex-col items-start gap-3 rounded border border-above bg-card p-4 text-above-strong"
+      className="flex flex-col items-start gap-3 rounded border border-above bg-card p-4 text-above-text"
     >
       <h2 className="text-lg font-semibold">Player data could not be loaded.</h2>
       <p>{kind ? sentences[kind] : fallbackSentence}</p>
@@ -31,7 +31,7 @@ function LoadErrorBanner({
         type="button"
         data-testid="load-error-reload"
         onClick={() => onReload()}
-        className={`rounded border border-above px-3 py-1 text-above-strong ${FOCUS_RING}`}
+        className={`rounded border border-above px-3 py-1 text-above-text ${FOCUS_RING}`}
       >
         Reload Application
       </button>
