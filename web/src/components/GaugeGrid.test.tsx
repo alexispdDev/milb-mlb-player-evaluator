@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import players from '../data/players.json'
 import { playerProfilesSchema, type Metric } from '../data/schema'
@@ -69,5 +69,31 @@ describe('GaugeGrid', () => {
     expect(screen.getByRole('region', { name: 'Statcast metrics' })).toBe(
       screen.getByTestId('gauge-grid'),
     )
+  })
+
+  describe('N/A metrics from the fixture', () => {
+    const profileFor = (name: string, season: number) =>
+      profiles.find((p) => p.identity.fullName === name && p.season === season)!
+
+    it('renders one N/A card for Nick Carver 2025 (max_ev)', () => {
+      render(<GaugeGrid metrics={profileFor('Nick Carver', 2025).metrics} />)
+      expect(screen.getAllByTestId('gauge-card')).toHaveLength(8)
+      expect(screen.getAllByTestId('gauge-card-na')).toHaveLength(1)
+      expect(screen.getAllByTestId('gauge-card-value')).toHaveLength(7)
+      expect(screen.getAllByTestId('gauge-needle')).toHaveLength(7)
+      const card = screen.getByTestId('gauge-card-na').closest('[data-testid="gauge-card"]')!
+      expect(within(card as HTMLElement).getByTestId('gauge-card-title')).toHaveTextContent(
+        'MAX EXIT VELO',
+      )
+      expect(within(card as HTMLElement).getByTestId('gauge-card-benchmark')).toHaveTextContent(
+        'Avg: 109.8 MPH',
+      )
+    })
+
+    it('renders no N/A card for Freddie Freeman 2024', () => {
+      render(<GaugeGrid metrics={profileFor('Freddie Freeman', 2024).metrics} />)
+      expect(screen.queryAllByTestId('gauge-card-na')).toHaveLength(0)
+      expect(screen.getAllByTestId('gauge-card-value')).toHaveLength(8)
+    })
   })
 })

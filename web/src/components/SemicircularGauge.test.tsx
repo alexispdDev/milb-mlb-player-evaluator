@@ -92,4 +92,27 @@ describe('SemicircularGauge', () => {
     expect(container.querySelector('text')).toBeNull()
     expect(container.innerHTML).not.toMatch(/transition|animation|keyframes|bg-card|padding|border/i)
   })
+
+  describe('null percentile (N/A mode)', () => {
+    it('renders only a grey track', () => {
+      const { container } = render(<SemicircularGauge percentile={null} />)
+      const svg = screen.getByTestId('gauge')
+      expect(svg).toHaveAttribute('aria-hidden', 'true')
+      expect(svg).toHaveAttribute('viewBox', '0 0 200 110')
+      expect(svg).toHaveAttribute('width', '100%')
+      expect(screen.queryByTestId('gauge-arc')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('gauge-needle')).not.toBeInTheDocument()
+      expect(container.innerHTML).not.toMatch(/color-(above|below)/)
+    })
+
+    it('keeps track geometry, with stroke subtext and opacity 0.5', () => {
+      render(<SemicircularGauge percentile={null} />)
+      expect(track()).toHaveAttribute('d', gaugeArcPath(0, 180))
+      expect(track()).toHaveAttribute('fill', 'none')
+      expect(track()).toHaveAttribute('stroke-width', '16')
+      expect(track()).toHaveAttribute('stroke-linecap', 'round')
+      expect(track()).toHaveAttribute('stroke', 'var(--color-subtext)')
+      expect(track()).toHaveAttribute('opacity', '0.5')
+    })
+  })
 })

@@ -32,6 +32,16 @@ function MetricValueDisplay({ text }: { text: string }) {
   )
 }
 
+function NotAvailableDisplay() {
+  return (
+    <div className="absolute inset-x-0 bottom-0 flex justify-center">
+      <span data-testid="gauge-card-na" className="text-xl font-bold text-subtext">
+        N/A
+      </span>
+    </div>
+  )
+}
+
 function LeagueBenchmarkDisplay({ text }: { text: string }) {
   return (
     <p data-testid="gauge-card-benchmark" className="text-xs text-subtext">
@@ -42,19 +52,26 @@ function LeagueBenchmarkDisplay({ text }: { text: string }) {
 
 function StatcastGaugeCard({ metric }: StatcastGaugeCardProps) {
   const { value, percentile } = metric
-  const color = isAboveAverage(metric) ? 'var(--color-above)' : 'var(--color-below)'
+  const isNa = value === null || percentile === null
+  const color = isNa
+    ? undefined
+    : isAboveAverage(metric)
+      ? 'var(--color-above)'
+      : 'var(--color-below)'
   return (
     <div
       data-testid="gauge-card"
       className={`${GAUGE_CARD_WRAPPER} ${GAUGE_CARD_MIN_HEIGHT}`}
     >
       <CardHeader name={metric.name} />
-      {value !== null && percentile !== null && (
-        <div className="relative w-full">
-          <SemicircularGauge percentile={percentile} color={color} />
+      <div className="relative w-full">
+        <SemicircularGauge percentile={isNa ? null : percentile} color={color} />
+        {isNa ? (
+          <NotAvailableDisplay />
+        ) : (
           <MetricValueDisplay text={formatMetricValue(value, metric.unit)} />
-        </div>
-      )}
+        )}
+      </div>
       <LeagueBenchmarkDisplay
         text={`Avg: ${formatMetricValue(metric.leagueAvg, metric.unit)}`}
       />

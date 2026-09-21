@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import players from '../data/players.json'
 import { playerProfilesSchema, type Metric } from '../data/schema'
 import StatcastGaugeCard from './StatcastGaugeCard'
+import { GAUGE_CARD_MIN_HEIGHT, GAUGE_CARD_WRAPPER } from './skeletonDimensions'
 
 const profiles = playerProfilesSchema.parse(players)
 const freeman = profiles.find(
@@ -92,17 +93,56 @@ describe('StatcastGaugeCard', () => {
     )
   })
 
-  it.each([
-    ['value', { value: null }],
-    ['percentile', { percentile: null }],
-  ])('null %s renders no gauge and no value', (_, patch) => {
-    render(<StatcastGaugeCard metric={{ ...base, ...patch }} />)
-    expect(screen.getByTestId('gauge-card-title')).toBeInTheDocument()
-    expect(screen.getByTestId('gauge-card-benchmark')).toHaveTextContent('Avg: 8.5%')
-    expect(screen.queryByTestId('gauge')).not.toBeInTheDocument()
-    expect(screen.queryByTestId('gauge-card-value')).not.toBeInTheDocument()
-    const text = screen.getByTestId('gauge-card').textContent ?? ''
-    expect(text).not.toMatch(/null|NaN|0\.0/)
+  describe.each([
+    ['value null only', { value: null }],
+    ['percentile null only', { percentile: null }],
+    ['both null', { value: null, percentile: null }],
+  ])('N/A state: %s', (_, patch) => {
+    const renderNa = () => render(<StatcastGaugeCard metric={{ ...base, ...patch }} />)
+
+    it('renders the N/A card with grey track, no arc or needle', () => {
+      renderNa()
+      const card = screen.getByTestId('gauge-card')
+      expect(card).toHaveClass(...GAUGE_CARD_WRAPPER.split(' '))
+      expect(card).toHaveClass(GAUGE_CARD_MIN_HEIGHT)
+      expect(screen.getByTestId('gauge-card-title')).toHaveTextContent('X')
+      expect(screen.getByTestId('gauge')).toBeInTheDocument()
+      expect(screen.getByTestId('gauge-track')).toBeInTheDocument()
+      expect(screen.queryByTestId('gauge-arc')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('gauge-needle')).not.toBeInTheDocument()
+      const na = screen.getByTestId('gauge-card-na')
+      expect(na).toHaveTextContent(/^N\/A$/)
+      expect(na).toHaveClass('text-subtext', 'font-bold')
+      expect(na).not.toHaveClass('text-foreground')
+      expect(screen.getByTestId('gauge-card-benchmark')).toHaveTextContent(/^Avg: 8\.5%$/)
+    })
+
+    it('shows no value and no null-derived text', () => {
+      renderNa()
+      expect(screen.queryByTestId('gauge-card-value')).not.toBeInTheDocument()
+      const text = screen.getByTestId('gauge-card').textContent ?? ''
+      expect(text).not.toMatch(/null|NaN|0\.0|10%|0%|0 MPH/)
+    })
+
+    it('uses no above/below colors', () => {
+      renderNa()
+      const card = screen.getByTestId('gauge-card')
+      expect(card.className).not.toMatch(/above|below/)
+      for (const el of card.querySelectorAll('*')) {
+        for (const attr of ['stroke', 'fill']) {
+          expect(el.getAttribute(attr) ?? '').not.toMatch(/color-(above|below)/)
+        }
+        expect(el.getAttribute('class') ?? '').not.toMatch(/above|below/)
+      }
+    })
+  })
+
+  it('a normal card has no N/A element', () => {
+    render(<StatcastGaugeCard metric={base} />)
+    expect(screen.queryByTestId('gauge-card-na')).not.toBeInTheDocument()
+    expect(screen.getByTestId('gauge-card-value')).toBeInTheDocument()
+    expect(screen.getByTestId('gauge-arc')).toBeInTheDocument()
+    expect(screen.getByTestId('gauge-needle')).toBeInTheDocument()
   })
 
   it('truncates long names with a title attribute', () => {

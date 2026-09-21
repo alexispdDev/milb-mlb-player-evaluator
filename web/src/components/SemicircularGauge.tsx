@@ -1,11 +1,26 @@
 import { GAUGE_VIEWBOX, gaugeArcPath, percentileToAngle } from './gaugeMath'
 
 interface SemicircularGaugeProps {
-  percentile: number
-  color: string
+  percentile: number | null
+  color?: string
 }
 
 function SemicircularGauge({ percentile, color }: SemicircularGaugeProps) {
+  if (percentile === null) {
+    return (
+      <svg data-testid="gauge" viewBox={GAUGE_VIEWBOX} width="100%" aria-hidden="true">
+        <path
+          data-testid="gauge-track"
+          d={gaugeArcPath(0, 180)}
+          fill="none"
+          stroke="var(--color-subtext)"
+          strokeWidth="16"
+          strokeLinecap="round"
+          opacity="0.5"
+        />
+      </svg>
+    )
+  }
   const angle = percentileToAngle(percentile)
   return (
     <svg data-testid="gauge" viewBox={GAUGE_VIEWBOX} width="100%" aria-hidden="true">
@@ -22,7 +37,7 @@ function SemicircularGauge({ percentile, color }: SemicircularGaugeProps) {
         data-testid="gauge-arc"
         d={gaugeArcPath(0, angle)}
         fill="none"
-        stroke={color}
+        stroke={color ?? 'var(--color-subtext)'}
         strokeWidth="16"
         strokeLinecap="round"
       />
