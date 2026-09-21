@@ -8,6 +8,11 @@ import {
   YAxis,
 } from 'recharts'
 import type { PlayerProfile } from '../data/schema'
+import {
+  CHART_HEIGHT,
+  TREND_CARD_MIN_HEIGHT,
+  TREND_CARD_WRAPPER,
+} from './skeletonDimensions'
 import { formatTrendTooltip } from './trendFormat'
 
 type Trend = PlayerProfile['trend']
@@ -21,7 +26,6 @@ interface RollingTrendChartCardProps {
   height?: number
 }
 
-const CHART_HEIGHT = 280
 const AXIS_LINE = { stroke: 'var(--color-header)' }
 const TICK = { fill: 'var(--color-subtext)', fontSize: 12 }
 
@@ -141,7 +145,7 @@ function RollingTrendChartCard({
   return (
     <div
       data-testid="trend-card"
-      className="flex min-w-0 flex-col gap-2 rounded-lg bg-card p-4 text-foreground"
+      className={`${TREND_CARD_WRAPPER} ${TREND_CARD_MIN_HEIGHT}`}
     >
       <ChartHeader name={trend.metricName} />
       {trend.points.length === 0 ? (

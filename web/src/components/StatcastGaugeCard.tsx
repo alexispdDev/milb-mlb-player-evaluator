@@ -1,6 +1,7 @@
 import type { Metric } from '../data/schema'
 import { formatMetricValue, isAboveAverage } from './metricFormat'
 import SemicircularGauge from './SemicircularGauge'
+import { GAUGE_CARD_MIN_HEIGHT, GAUGE_CARD_WRAPPER } from './skeletonDimensions'
 
 interface StatcastGaugeCardProps {
   metric: Metric
@@ -45,7 +46,7 @@ function StatcastGaugeCard({ metric }: StatcastGaugeCardProps) {
   return (
     <div
       data-testid="gauge-card"
-      className="flex min-w-0 flex-col items-center gap-2 rounded-lg bg-card p-4"
+      className={`${GAUGE_CARD_WRAPPER} ${GAUGE_CARD_MIN_HEIGHT}`}
     >
       <CardHeader name={metric.name} />
       {value !== null && percentile !== null && (

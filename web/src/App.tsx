@@ -1,5 +1,8 @@
 import DashboardLayout from './components/DashboardLayout'
 import GaugeGrid from './components/GaugeGrid'
+import GaugeGridSkeleton from './components/GaugeGridSkeleton'
+import IdentityCardSkeleton from './components/IdentityCardSkeleton'
+import TrendChartSkeleton from './components/TrendChartSkeleton'
 import PlayerIdentityCard from './components/PlayerIdentityCard'
 import RollingTrendChartCard from './components/RollingTrendChartCard'
 import PlayerSelector from './components/PlayerSelector'
@@ -20,7 +23,13 @@ function LoadError() {
   )
 }
 
-function Dashboard({ players }: { players: PlayerProfile[] }) {
+function Dashboard({
+  players,
+  loading,
+}: {
+  players: PlayerProfile[]
+  loading: boolean
+}) {
   const state = useDashboardState(players)
   const { profile } = state
   if (!profile) return <LoadError />
@@ -40,16 +49,30 @@ function Dashboard({ players }: { players: PlayerProfile[] }) {
           onSelect={state.selectSeason}
         />
       }
-      identity={<PlayerIdentityCard profile={profile} />}
-      gauges={<GaugeGrid metrics={profile.metrics} />}
-      trend={<RollingTrendChartCard trend={profile.trend} />}
+      identity={
+        loading ? <IdentityCardSkeleton /> : <PlayerIdentityCard profile={profile} />
+      }
+      gauges={loading ? <GaugeGridSkeleton /> : <GaugeGrid metrics={profile.metrics} />}
+      trend={
+        loading ? (
+          <TrendChartSkeleton />
+        ) : (
+          <RollingTrendChartCard trend={profile.trend} />
+        )
+      }
     />
   )
 }
 
-function App({ loadResult = defaultLoadResult }: { loadResult?: LoadResult }) {
+function App({
+  loadResult = defaultLoadResult,
+  loading = false,
+}: {
+  loadResult?: LoadResult
+  loading?: boolean
+}) {
   if (!loadResult.ok) return <LoadError />
-  return <Dashboard players={loadResult.players} />
+  return <Dashboard players={loadResult.players} loading={loading} />
 }
 
 export default App

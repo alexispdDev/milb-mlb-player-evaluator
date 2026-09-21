@@ -158,3 +158,39 @@ describe('App', () => {
     expect(screen.queryByTestId('trend-card')).not.toBeInTheDocument()
   })
 })
+
+describe('App loading', () => {
+  const skeletonIds = ['skeleton-identity', 'skeleton-gauge-grid', 'skeleton-trend']
+  const realIds = ['identity-card', 'gauge-grid', 'trend-card']
+
+  it('shows skeletons only, keeps nav, and swaps back to real content', () => {
+    const { rerender } = render(<App loading />)
+    skeletonIds.forEach((id) => expect(screen.getByTestId(id)).toBeInTheDocument())
+    realIds.forEach((id) => expect(screen.queryByTestId(id)).toBeNull())
+    expect(screen.getAllByTestId('skeleton-gauge-card').length).toBe(8)
+    expect(screen.getByRole('combobox', { name: 'Player' })).toBeInTheDocument()
+    rerender(<App loading={false} />)
+    skeletonIds.forEach((id) => expect(screen.queryByTestId(id)).toBeNull())
+    expect(screen.queryByTestId('skeleton-gauge-card')).toBeNull()
+    realIds.forEach((id) => expect(screen.getByTestId(id)).toBeInTheDocument())
+    expect(screen.getAllByTestId('gauge-card').length).toBe(8)
+  })
+
+  it('does not show skeletons by default', () => {
+    render(<App />)
+    skeletonIds.forEach((id) => expect(screen.queryByTestId(id)).toBeNull())
+  })
+
+  it('nav stays interactive while loading', () => {
+    render(<App loading />)
+    const radios = screen.getAllByRole('radio')
+    expect(() => fireEvent.click(radios[radios.length - 1])).not.toThrow()
+    skeletonIds.forEach((id) => expect(screen.getByTestId(id)).toBeInTheDocument())
+  })
+
+  it('load error wins over loading', () => {
+    render(<App loading loadResult={{ ok: false, error: 'x' } as unknown as LoadResult} />)
+    expect(screen.getByRole('alert')).toBeInTheDocument()
+    skeletonIds.forEach((id) => expect(screen.queryByTestId(id)).toBeNull())
+  })
+})
