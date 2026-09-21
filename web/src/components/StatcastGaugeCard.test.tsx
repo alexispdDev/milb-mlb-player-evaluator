@@ -1,0 +1,115 @@
+import { render, screen } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
+import players from '../data/players.json'
+import { playerProfilesSchema, type Metric } from '../data/schema'
+import StatcastGaugeCard from './StatcastGaugeCard'
+
+const profiles = playerProfilesSchema.parse(players)
+const freeman = profiles.find(
+  (p) => p.identity.fullName === 'Freddie Freeman' && p.season === 2024,
+)!
+
+function fixture(id: string): Metric {
+  const m = freeman.metrics.find((x) => x.id === id)
+  if (!m) throw new Error(`metric not found: ${id}`)
+  return m
+}
+
+const base: Metric = {
+  id: 'x',
+  name: 'X',
+  unit: '%',
+  value: 10,
+  leagueAvg: 8.5,
+  percentile: 50,
+  inverted: false,
+}
+
+const stroke = () => screen.getByTestId('gauge-arc').getAttribute('stroke')
+
+describe('StatcastGaugeCard', () => {
+  it('renders shell, title, value and benchmark for Barrel%', () => {
+    render(<StatcastGaugeCard metric={fixture('barrel_rate')} />)
+    expect(screen.getByTestId('gauge-card')).toHaveClass('bg-card')
+    const title = screen.getByTestId('gauge-card-title')
+    expect(title).toHaveTextContent('BARREL%')
+    expect(title).toHaveClass('text-foreground')
+    expect(screen.getByTestId('gauge-card-value')).toHaveTextContent(/^12\.8%$/)
+    expect(screen.getByTestId('gauge-card-value')).toHaveClass('text-foreground')
+    expect(screen.getByTestId('gauge-card-benchmark')).toHaveTextContent(/^Avg: 8\.5%$/)
+    expect(screen.getByTestId('gauge-card-benchmark')).toHaveClass('text-subtext')
+    expect(screen.getByTestId('gauge')).toBeInTheDocument()
+    expect(stroke()).toBe('var(--color-above)')
+  })
+
+  it('formats MPH and degree units', () => {
+    const { unmount } = render(<StatcastGaugeCard metric={fixture('avg_ev')} />)
+    expect(screen.getByTestId('gauge-card-value')).toHaveTextContent(/^91\.5 MPH$/)
+    expect(screen.getByTestId('gauge-card-benchmark')).toHaveTextContent(
+      /^Avg: 88\.9 MPH$/,
+    )
+    unmount()
+    render(<StatcastGaugeCard metric={fixture('avg_la')} />)
+    expect(screen.getByTestId('gauge-card-value')).toHaveTextContent(/^14\.2°$/)
+    expect(screen.getByTestId('gauge-card-benchmark')).toHaveTextContent(/^Avg: 12\.3°$/)
+  })
+
+  it('shows integers with one decimal', () => {
+    render(<StatcastGaugeCard metric={fixture('whiff_rate')} />)
+    expect(screen.getByTestId('gauge-card-benchmark')).toHaveTextContent(/^Avg: 23\.0%$/)
+    expect(stroke()).toBe('var(--color-above)')
+  })
+
+  it('colors below-average non-inverted blue', () => {
+    render(<StatcastGaugeCard metric={{ ...base, value: 5 }} />)
+    expect(stroke()).toBe('var(--color-below)')
+  })
+
+  it('colors above-average inverted blue', () => {
+    render(
+      <StatcastGaugeCard
+        metric={{ ...base, value: 30, leagueAvg: 23, inverted: true }}
+      />,
+    )
+    expect(stroke()).toBe('var(--color-below)')
+  })
+
+  it.each([false, true])('ties are blue (inverted=%s)', (inverted) => {
+    render(<StatcastGaugeCard metric={{ ...base, value: 8.5, inverted }} />)
+    expect(stroke()).toBe('var(--color-below)')
+  })
+
+  it('color ignores percentile', () => {
+    render(<StatcastGaugeCard metric={{ ...base, value: 10, percentile: 30 }} />)
+    expect(stroke()).toBe('var(--color-above)')
+  })
+
+  it('passes percentile to the gauge', () => {
+    render(<StatcastGaugeCard metric={{ ...base, percentile: 50 }} />)
+    expect(screen.getByTestId('gauge-needle')).toHaveAttribute(
+      'transform',
+      'rotate(90 100 100)',
+    )
+  })
+
+  it.each([
+    ['value', { value: null }],
+    ['percentile', { percentile: null }],
+  ])('null %s renders no gauge and no value', (_, patch) => {
+    render(<StatcastGaugeCard metric={{ ...base, ...patch }} />)
+    expect(screen.getByTestId('gauge-card-title')).toBeInTheDocument()
+    expect(screen.getByTestId('gauge-card-benchmark')).toHaveTextContent('Avg: 8.5%')
+    expect(screen.queryByTestId('gauge')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('gauge-card-value')).not.toBeInTheDocument()
+    const text = screen.getByTestId('gauge-card').textContent ?? ''
+    expect(text).not.toMatch(/null|NaN|0\.0/)
+  })
+
+  it('truncates long names with a title attribute', () => {
+    const name = 'A very long metric name '.repeat(8)
+    render(<StatcastGaugeCard metric={{ ...base, name }} />)
+    const title = screen.getByTestId('gauge-card-title')
+    expect(title).toHaveClass('truncate')
+    expect(title).toHaveAttribute('title', name)
+  })
+})
