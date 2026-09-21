@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import App from './App'
 import fixture from './data/players.json'
@@ -26,6 +26,20 @@ function make(
 
 const ok = (players: PlayerProfile[]): LoadResult => ({ ok: true, players })
 
+function openList() {
+  const input = screen.getByRole('combobox', { name: 'Player' })
+  input.focus()
+  fireEvent.click(input)
+}
+
+async function choosePlayer(name: string) {
+  openList()
+  // Headless UI selects an option on mousedown, so simulate the full click.
+  const option = await screen.findByRole('option', { name })
+  fireEvent.mouseDown(option)
+  fireEvent.click(option)
+}
+
 const chartLabel = () =>
   screen.getByTestId('trend-chart').getAttribute('aria-label')
 
@@ -49,11 +63,13 @@ describe('App', () => {
     )
   })
 
-  it('lists every player once and the selected player\'s seasons', () => {
+  it('lists every player once and the selected player\'s seasons', async () => {
     render(<App />)
-    const names = Array.from(
-      screen.getByLabelText('Player').querySelectorAll('option'),
-    ).map((o) => o.textContent)
+    openList()
+    await screen.findAllByRole('option')
+    const names = within(screen.getByTestId('player-selector'))
+      .getAllByRole('option')
+      .map((o) => o.textContent)
     const expected = [...new Set(base.map((p) => p.identity.fullName))]
     expect(names).toEqual(expected)
     const seasons = Array.from(
@@ -62,11 +78,11 @@ describe('App', () => {
     expect(seasons).toEqual(['2024', '2025'])
   })
 
-  it('updates identity, gauges and trend when the player changes', () => {
+  it('updates identity, gauges and trend when the player changes', async () => {
     render(<App loadResult={ok(custom)} />)
     expect(screen.getByTestId('player-name')).toHaveTextContent('Name a')
     const before = screen.getAllByTestId('gauge-card-value')[0].textContent
-    fireEvent.change(screen.getByLabelText('Player'), { target: { value: 'b' } })
+    await choosePlayer('Name b')
     expect(screen.getByTestId('player-name')).toHaveTextContent('Name b')
     expect(screen.getAllByTestId('gauge-card-value')[0].textContent).not.toBe(
       before,
@@ -86,24 +102,24 @@ describe('App', () => {
     expect(screen.getAllByTestId('gauge-card-value')[0]).toHaveTextContent('11')
   })
 
-  it('keeps the selected season when switching to a player who has it', () => {
+  it('keeps the selected season when switching to a player who has it', async () => {
     render(<App loadResult={ok(custom)} />)
-    fireEvent.change(screen.getByLabelText('Player'), { target: { value: 'b' } })
+    await choosePlayer('Name b')
     expect(screen.getByLabelText('Season')).toHaveValue('2025')
   })
 
-  it('falls back to the latest season for a player lacking the season', () => {
+  it('falls back to the latest season for a player lacking the season', async () => {
     render(<App loadResult={ok(custom)} />)
-    fireEvent.change(screen.getByLabelText('Player'), { target: { value: 'c' } })
+    await choosePlayer('Name c')
     expect(screen.getByLabelText('Season')).toHaveValue('2024')
     expect(screen.getByTestId('player-name')).toHaveTextContent('Name c')
     expect(chartLabel()).toContain('C24')
     expect(screen.getAllByTestId('gauge-card-value')[0]).toHaveTextContent('31')
   })
 
-  it('lists only the single season of a single-season player', () => {
+  it('lists only the single season of a single-season player', async () => {
     render(<App loadResult={ok(custom)} />)
-    fireEvent.change(screen.getByLabelText('Player'), { target: { value: 'c' } })
+    await choosePlayer('Name c')
     const seasons = Array.from(
       screen.getByLabelText('Season').querySelectorAll('option'),
     ).map((o) => o.textContent)
