@@ -1,4 +1,5 @@
 import type { Metric } from '../data/schema'
+import { buildGaugeAriaLabel } from './gaugeAria'
 import { formatMetricValue, isAboveAverage } from './metricFormat'
 import SemicircularGauge from './SemicircularGauge'
 import { GAUGE_CARD_MIN_HEIGHT, GAUGE_CARD_WRAPPER } from './skeletonDimensions'
@@ -10,6 +11,7 @@ interface StatcastGaugeCardProps {
 function CardHeader({ name }: { name: string }) {
   return (
     <h3
+      aria-hidden="true"
       data-testid="gauge-card-title"
       title={name}
       className="w-full truncate text-center text-sm font-semibold text-foreground"
@@ -21,7 +23,7 @@ function CardHeader({ name }: { name: string }) {
 
 function MetricValueDisplay({ text }: { text: string }) {
   return (
-    <div className="absolute inset-x-0 bottom-0 flex justify-center">
+    <div aria-hidden="true" className="absolute inset-x-0 bottom-0 flex justify-center">
       <span
         data-testid="gauge-card-value"
         className="text-xl font-bold text-foreground"
@@ -34,7 +36,7 @@ function MetricValueDisplay({ text }: { text: string }) {
 
 function NotAvailableDisplay() {
   return (
-    <div className="absolute inset-x-0 bottom-0 flex justify-center">
+    <div aria-hidden="true" className="absolute inset-x-0 bottom-0 flex justify-center">
       <span data-testid="gauge-card-na" className="text-xl font-bold text-subtext">
         N/A
       </span>
@@ -44,7 +46,7 @@ function NotAvailableDisplay() {
 
 function LeagueBenchmarkDisplay({ text }: { text: string }) {
   return (
-    <p data-testid="gauge-card-benchmark" className="text-xs text-subtext">
+    <p aria-hidden="true" data-testid="gauge-card-benchmark" className="text-xs text-subtext">
       {text}
     </p>
   )
@@ -60,6 +62,8 @@ function StatcastGaugeCard({ metric }: StatcastGaugeCardProps) {
       : 'var(--color-below)'
   return (
     <div
+      role="group"
+      aria-label={buildGaugeAriaLabel(metric)}
       data-testid="gauge-card"
       className={`${GAUGE_CARD_WRAPPER} ${GAUGE_CARD_MIN_HEIGHT}`}
     >

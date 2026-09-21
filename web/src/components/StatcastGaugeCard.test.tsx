@@ -153,3 +153,24 @@ describe('StatcastGaugeCard', () => {
     expect(title).toHaveAttribute('title', name)
   })
 })
+
+describe('StatcastGaugeCard accessible label', () => {
+  it('exposes a named group for a normal metric', () => {
+    render(<StatcastGaugeCard metric={fixture('barrel_rate')} />)
+    expect(
+      screen.getByRole('group', {
+        name: 'Barrel Percentage: 12.8 percent, League Average: 8.5 percent',
+      }),
+    ).toBe(screen.getByTestId('gauge-card'))
+  })
+
+  it('exposes the N/A label and keeps the visible N/A text', () => {
+    render(<StatcastGaugeCard metric={{ ...fixture('max_ev'), value: null, percentile: null }} />)
+    expect(
+      screen.getByRole('group', {
+        name: 'Maximum Exit Velocity: not available, League Average: 109.6 miles per hour',
+      }),
+    ).toBeInTheDocument()
+    expect(screen.getByTestId('gauge-card-na')).toHaveTextContent('N/A')
+  })
+})

@@ -97,3 +97,10 @@ describe('GaugeGrid', () => {
     })
   })
 })
+
+describe('GaugeGrid accessible labels', () => {
+  it('exposes 8 labelled groups', () => {
+    render(<GaugeGrid metrics={metrics} />)
+    expect(screen.getAllByRole('group', { name: /League Average/ })).toHaveLength(8)
+  })
+})
